@@ -90,7 +90,7 @@ export default function InpatientsPage() {
       setForm({ patient_id: "", doctor_id: "", department_id: "", room_number: "", ward_type: "General", diagnosis: "", treatment_plan: "" });
       await fetchList();
       alert("Patient Admitted Successfully");
-    } catch (e: any) {
+    } catch (e: unknown) {
       const msg = axios.isAxiosError(e) ? e.response?.data?.error : "Failed to admit";
       alert(msg);
     } finally {
@@ -103,7 +103,7 @@ export default function InpatientsPage() {
       await axios.put(`http://localhost:5000/api/patient/inpatients/discharge/${id}`);
       await fetchList();
       alert("Patient Discharged");
-    } catch (e: any) {
+    } catch (e: unknown) {
       const msg = axios.isAxiosError(e) ? e.response?.data?.error : "Failed to discharge";
       alert(msg);
     }

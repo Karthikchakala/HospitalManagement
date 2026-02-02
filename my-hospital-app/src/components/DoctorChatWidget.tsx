@@ -1,11 +1,11 @@
 "use client";
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useChat, JoinPayload, AppointmentType } from '../lib/useChat';
+import { useChat, JoinPayload, AppointmentType, ChatMessage } from '../lib/useChat';
 
 const defaultServer = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
 
 type PatientItem = { patient_id: number; name: string };
-type DoctorProfile = { name: string; Doctor?: { doctor_id?: number } };
+
 type Appointment = { appointment_id: number; appointment_date: string; patient_id: number };
 
 function ChatRoom({ serverUrl, join }: { serverUrl: string; join: JoinPayload }) {
@@ -27,7 +27,7 @@ function ChatRoom({ serverUrl, join }: { serverUrl: string; join: JoinPayload })
         <span className="font-semibold text-cyan-200">Doctor Chat</span>
       </div>
       <div className="flex-1 overflow-y-auto p-3 space-y-2 bg-slate-950/70">
-        {messages.map((m: any) => (
+        {messages.map((m: ChatMessage) => (
           <div key={m.message_id || `${m.sender_id}-${m.created_at}`} className={`flex ${String(m.sender_type) === join.senderType ? 'justify-end' : 'justify-start'}`}>
             <div className={`max-w-[80%] rounded-xl px-3 py-2 text-sm shadow ${String(m.sender_type) === join.senderType ? 'bg-cyan-500/20 text-cyan-100 border border-cyan-600/50' : 'bg-slate-900/70 text-gray-100 border border-cyan-700/40'}`}>
               <p className="whitespace-pre-wrap">{m.message}</p>
@@ -74,13 +74,13 @@ export default function DoctorChatWidget() {
         if (!token) return;
         const res = await fetch(`${defaultServer}/api/doctor/profile`, { headers: { Authorization: `Bearer ${token}` } });
         if (res.ok) {
-          const data: any = await res.json();
+          const data = (await res.json()) as { Doctor?: { doctor_id: number }[]; name: string };
           const docRel = Array.isArray(data?.Doctor) ? data.Doctor[0] : data?.Doctor;
           const did = docRel?.doctor_id ? Number(docRel.doctor_id) : 0;
           setDoctorId(did || 0);
           setDoctorName(data?.name || 'Doctor');
         }
-      } catch {}
+      } catch { }
     })();
   }, []);
 
@@ -95,7 +95,7 @@ export default function DoctorChatWidget() {
           const list: PatientItem[] = await res.json();
           setPatients(list);
         }
-      } catch {}
+      } catch { }
     })();
   }, []);
 
@@ -110,7 +110,7 @@ export default function DoctorChatWidget() {
           const list: Appointment[] = await res.json();
           setAppointments(list || []);
         }
-      } catch {}
+      } catch { }
     })();
   }, []);
 
@@ -129,7 +129,7 @@ export default function DoctorChatWidget() {
     if (!apptId) return { chatContext: 'general', patientId: selectedPatient.patient_id, doctorId, senderType: 'doctor', senderId: doctorId };
     // For Appointments table entries, default to 'in_person'
     return { chatContext: 'appointment', appointmentType: 'in_person' as AppointmentType, appointmentId: apptId, patientId: selectedPatient.patient_id, doctorId, senderType: 'doctor', senderId: doctorId } as JoinPayload;
-  }, [doctorId, selectedPatient, context, selectedAppointmentId, JSON.stringify(patientAppointments)]);
+  }, [doctorId, selectedPatient, context, selectedAppointmentId, patientAppointments]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
@@ -137,7 +137,7 @@ export default function DoctorChatWidget() {
         <div className="p-3 border-b border-cyan-700/40 text-sm text-cyan-200 font-semibold">Patients</div>
         <div className="max-h-[70vh] overflow-y-auto">
           {patients.map(p => (
-            <button key={p.patient_id} onClick={() => { setSelectedPatient(p); }} className={`w-full text-left px-3 py-2 text-sm border-b border-cyan-700/20 hover:bg-slate-900/70 ${selectedPatient?.patient_id===p.patient_id? 'bg-slate-900/60' : ''}`}>
+            <button key={p.patient_id} onClick={() => { setSelectedPatient(p); }} className={`w-full text-left px-3 py-2 text-sm border-b border-cyan-700/20 hover:bg-slate-900/70 ${selectedPatient?.patient_id === p.patient_id ? 'bg-slate-900/60' : ''}`}>
               <div className="text-gray-200">{p.name || 'Patient'}</div>
               <div className="text-xs text-gray-400">ID: {p.patient_id}</div>
             </button>
@@ -150,16 +150,16 @@ export default function DoctorChatWidget() {
 
       <div className="md:col-span-2">
         <div className="mb-3 flex items-center gap-2 text-sm">
-          <div className="px-2 py-1 rounded bg-slate-900/70 border border-cyan-700/40 text-gray-200">Dr. {doctorName}{doctorId? ` (ID: ${doctorId})`:''}</div>
+          <div className="px-2 py-1 rounded bg-slate-900/70 border border-cyan-700/40 text-gray-200">Dr. {doctorName}{doctorId ? ` (ID: ${doctorId})` : ''}</div>
           {selectedPatient && (
             <>
               <div className="px-2 py-1 rounded bg-slate-900/70 border border-cyan-700/40 text-gray-200">Chat with: {selectedPatient.name} (ID: {selectedPatient.patient_id})</div>
-              <select className="ml-auto rounded border border-cyan-700/40 bg-slate-900/70 text-gray-200 px-2 py-1" value={context} onChange={e=> setContext(e.target.value as any)}>
+              <select className="ml-auto rounded border border-cyan-700/40 bg-slate-900/70 text-gray-200 px-2 py-1" value={context} onChange={e => setContext(e.target.value as 'general' | 'appointment')}>
                 <option value="general">General</option>
                 <option value="appointment">Appointment</option>
               </select>
-              {context==='appointment' && (
-                <select className="rounded border border-cyan-700/40 bg-slate-900/70 text-gray-200 px-2 py-1" value={selectedAppointmentId || ''} onChange={e=> setSelectedAppointmentId(e.target.value? Number(e.target.value): null)}>
+              {context === 'appointment' && (
+                <select className="rounded border border-cyan-700/40 bg-slate-900/70 text-gray-200 px-2 py-1" value={selectedAppointmentId || ''} onChange={e => setSelectedAppointmentId(e.target.value ? Number(e.target.value) : null)}>
                   <option value="">Select appointment</option>
                   {patientAppointments.map(ap => (
                     <option key={ap.appointment_id} value={ap.appointment_id}>Appt #{ap.appointment_id} on {ap.appointment_date}</option>

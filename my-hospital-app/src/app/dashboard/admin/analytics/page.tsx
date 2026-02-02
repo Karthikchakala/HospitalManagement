@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, ChangeEvent } from 'react'
 import axios from 'axios'
 import DashboardNavbar from '../../../../components/DashboardNavbar'
 import DateFilter, { DateFilterValue } from '../../../../components/analytics/DateFilter'
@@ -23,6 +23,39 @@ const API_BASE = process.env.NEXT_PUBLIC_BACKEND_BASE_URL || 'http://localhost:5
 
 type Tab = 'revenue' | 'department' | 'doctor' | 'staff'
 
+interface ChartDataPoint {
+  label?: string
+  date?: string
+  value: number
+}
+
+interface RevenueData {
+  totalRevenue: number
+  byDepartment: ChartDataPoint[]
+  trend: ChartDataPoint[]
+  share: ChartDataPoint[]
+}
+
+interface DeptData {
+  byDepartment: ChartDataPoint[]
+  trend: ChartDataPoint[]
+}
+
+interface DoctorData {
+  byDoctor: ChartDataPoint[]
+  trend: ChartDataPoint[]
+  top10: ChartDataPoint[]
+}
+
+interface StaffCategory {
+  label: string
+  metrics: Record<string, number>
+}
+
+interface StaffData {
+  categories: StaffCategory[]
+}
+
 export default function AdminAnalyticsPage() {
   const [userName, setUserName] = useState('Admin')
   const [active, setActive] = useState<Tab>('revenue')
@@ -30,11 +63,11 @@ export default function AdminAnalyticsPage() {
   const [loading, setLoading] = useState(false)
 
   // Data stores
-  const [revenueData, setRevenueData] = useState<any | null>(null)
-  const [deptData, setDeptData] = useState<any | null>(null)
-  const [doctorData, setDoctorData] = useState<any | null>(null)
-  const [staffData, setStaffData] = useState<any | null>(null)
-  const [staffRole, setStaffRole] = useState<'receptionists'|'pharmacists'|'laboratorists'|'all'>('all')
+  const [revenueData, setRevenueData] = useState<RevenueData | null>(null)
+  const [deptData, setDeptData] = useState<DeptData | null>(null)
+  const [doctorData, setDoctorData] = useState<DoctorData | null>(null)
+  const [staffData, setStaffData] = useState<StaffData | null>(null)
+  const [staffRole, setStaffRole] = useState<'receptionists' | 'pharmacists' | 'laboratorists' | 'all'>('all')
 
   const queryParams = useMemo(() => {
     if (df.period === 'custom' && df.from && df.to) {
@@ -54,7 +87,7 @@ export default function AdminAnalyticsPage() {
       try {
         const resp = await axios.get(`${API_BASE}/api/admin/profile`, { headers: tokenHeader() })
         setUserName(resp.data?.name || 'Admin')
-      } catch {}
+      } catch { }
     })()
   }, [])
 
@@ -85,7 +118,11 @@ export default function AdminAnalyticsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active, JSON.stringify(queryParams), staffRole])
 
-  const COLORS = ['#22d3ee','#60a5fa','#34d399','#f97316','#a78bfa','#f472b6','#facc15']
+  const COLORS = ['#22d3ee', '#60a5fa', '#34d399', '#f97316', '#a78bfa', '#f472b6', '#facc15']
+
+  const handleStaffRoleChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    setStaffRole(e.target.value as 'receptionists' | 'pharmacists' | 'laboratorists' | 'all')
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 text-gray-100">
@@ -100,11 +137,11 @@ export default function AdminAnalyticsPage() {
             { key: 'department', label: 'Department Analytics' },
             { key: 'doctor', label: 'Doctor Analytics' },
             { key: 'staff', label: 'Staff Performance' },
-          ] as Array<{key:Tab,label:string}>).map(t => (
+          ] as Array<{ key: Tab, label: string }>).map(t => (
             <button
               key={t.key}
               onClick={() => setActive(t.key)}
-              className={`px-4 py-2 rounded-md border ${active===t.key? 'bg-cyan-600 border-cyan-400':'bg-slate-800 border-slate-700 hover:bg-slate-700'}`}
+              className={`px-4 py-2 rounded-md border ${active === t.key ? 'bg-cyan-600 border-cyan-400' : 'bg-slate-800 border-slate-700 hover:bg-slate-700'}`}
             >{t.label}</button>
           ))}
         </div>
@@ -112,14 +149,14 @@ export default function AdminAnalyticsPage() {
         {/* Filters */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-6">
           <DateFilter initial={df} onApply={setDf} />
-          {active==='staff' && (
+          {active === 'staff' && (
             <div className="flex items-end gap-3">
               <div className="flex flex-col">
                 <label className="text-xs text-gray-300 mb-1">Staff Role</label>
                 <select
                   className="bg-slate-800 border border-slate-600 text-gray-100 rounded-md px-3 py-2"
                   value={staffRole}
-                  onChange={(e)=> setStaffRole(e.target.value as any)}
+                  onChange={handleStaffRoleChange}
                 >
                   <option value="all">All</option>
                   <option value="receptionists">Receptionists</option>
@@ -137,9 +174,9 @@ export default function AdminAnalyticsPage() {
           </div>
         )}
 
-        {!loading && active==='revenue' && revenueData && (
+        {!loading && active === 'revenue' && revenueData && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <StatCard label="Total Revenue" value={`₹${(revenueData.totalRevenue||0).toLocaleString()}`} className="lg:col-span-3" />
+            <StatCard label="Total Revenue" value={`₹${(revenueData.totalRevenue || 0).toLocaleString()}`} className="lg:col-span-3" />
 
             <ChartCard title="Revenue by Department" subtitle="Bar Chart">
               <ResponsiveContainer width="100%" height="100%">
@@ -147,7 +184,7 @@ export default function AdminAnalyticsPage() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
                   <XAxis dataKey="label" stroke="#9ca3af" />
                   <YAxis stroke="#9ca3af" />
-                  <Tooltip contentStyle={{ background:'#0f172a', border:'1px solid #334155', color:'#e5e7eb' }} />
+                  <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid #334155', color: '#e5e7eb' }} />
                   <Legend />
                   <Bar dataKey="value" name="Revenue" fill="#22d3ee" />
                 </BarChart>
@@ -160,7 +197,7 @@ export default function AdminAnalyticsPage() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
                   <XAxis dataKey="date" stroke="#9ca3af" />
                   <YAxis stroke="#9ca3af" />
-                  <Tooltip contentStyle={{ background:'#0f172a', border:'1px solid #334155', color:'#e5e7eb' }} />
+                  <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid #334155', color: '#e5e7eb' }} />
                   <Legend />
                   <Line type="monotone" dataKey="value" name="Revenue" stroke="#60a5fa" strokeWidth={2} dot={false} />
                 </LineChart>
@@ -170,10 +207,10 @@ export default function AdminAnalyticsPage() {
             <ChartCard title="Department Share" subtitle="Pie Chart">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Tooltip contentStyle={{ background:'#0f172a', border:'1px solid #334155', color:'#e5e7eb' }} />
+                  <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid #334155', color: '#e5e7eb' }} />
                   <Legend />
                   <Pie data={revenueData.share || []} dataKey="value" nameKey="label" innerRadius={50} outerRadius={90}>
-                    {(revenueData.share || []).map((_:any, idx:number) => (
+                    {(revenueData.share || []).map((_: ChartDataPoint, idx: number) => (
                       <Cell key={idx} fill={COLORS[idx % COLORS.length]} />
                     ))}
                   </Pie>
@@ -183,7 +220,7 @@ export default function AdminAnalyticsPage() {
           </div>
         )}
 
-        {!loading && active==='department' && deptData && (
+        {!loading && active === 'department' && deptData && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <ChartCard title="Patients per Department" subtitle="Bar Chart">
               <ResponsiveContainer width="100%" height="100%">
@@ -191,7 +228,7 @@ export default function AdminAnalyticsPage() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
                   <XAxis dataKey="label" stroke="#9ca3af" />
                   <YAxis stroke="#9ca3af" />
-                  <Tooltip contentStyle={{ background:'#0f172a', border:'1px solid #334155', color:'#e5e7eb' }} />
+                  <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid #334155', color: '#e5e7eb' }} />
                   <Legend />
                   <Bar dataKey="value" name="Patients" fill="#34d399" />
                 </BarChart>
@@ -210,7 +247,7 @@ export default function AdminAnalyticsPage() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
                   <XAxis dataKey="date" stroke="#9ca3af" />
                   <YAxis stroke="#9ca3af" />
-                  <Tooltip contentStyle={{ background:'#0f172a', border:'1px solid #334155', color:'#e5e7eb' }} />
+                  <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid #334155', color: '#e5e7eb' }} />
                   <Legend />
                   <Area type="monotone" dataKey="value" name="Patients" stroke="#22d3ee" fill="url(#grad1)" />
                 </AreaChart>
@@ -219,7 +256,7 @@ export default function AdminAnalyticsPage() {
           </div>
         )}
 
-        {!loading && active==='doctor' && doctorData && (
+        {!loading && active === 'doctor' && doctorData && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <ChartCard title="Patients per Doctor" subtitle="Bar Chart">
               <ResponsiveContainer width="100%" height="100%">
@@ -227,7 +264,7 @@ export default function AdminAnalyticsPage() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
                   <XAxis dataKey="label" hide />
                   <YAxis stroke="#9ca3af" />
-                  <Tooltip contentStyle={{ background:'#0f172a', border:'1px solid #334155', color:'#e5e7eb' }} />
+                  <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid #334155', color: '#e5e7eb' }} />
                   <Legend />
                   <Bar dataKey="value" name="Patients" fill="#a78bfa" />
                 </BarChart>
@@ -241,7 +278,7 @@ export default function AdminAnalyticsPage() {
                     <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
                     <XAxis dataKey="date" stroke="#9ca3af" />
                     <YAxis stroke="#9ca3af" />
-                    <Tooltip contentStyle={{ background:'#0f172a', border:'1px solid #334155', color:'#e5e7eb' }} />
+                    <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid #334155', color: '#e5e7eb' }} />
                     <Legend />
                     <Line type="monotone" dataKey="value" name="Patients" stroke="#f97316" strokeWidth={2} dot={false} />
                   </LineChart>
@@ -261,7 +298,7 @@ export default function AdminAnalyticsPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {(doctorData.top10||[]).map((row:any, idx:number)=> (
+                      {(doctorData.top10 || []).map((row: ChartDataPoint, idx: number) => (
                         <tr key={idx} className="border-t border-slate-700/60">
                           <td className="py-2 pr-3">{row.label}</td>
                           <td className="py-2 pr-3">{row.value}</td>
@@ -275,15 +312,15 @@ export default function AdminAnalyticsPage() {
           </div>
         )}
 
-        {!loading && active==='staff' && staffData && (
+        {!loading && active === 'staff' && staffData && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <ChartCard title="Category Contribution" subtitle="Pie Chart">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Tooltip contentStyle={{ background:'#0f172a', border:'1px solid #334155', color:'#e5e7eb' }} />
+                  <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid #334155', color: '#e5e7eb' }} />
                   <Legend />
-                  <Pie data={(staffData.categories||[]).map((c:any)=>({ label:c.label, value: Object.values(c.metrics||{}).reduce((s:any,v:any)=> s + (typeof v==='number'? v : 0),0) }))} dataKey="value" nameKey="label" innerRadius={50} outerRadius={90}>
-                    {(staffData.categories||[]).map((_:any, idx:number) => (
+                  <Pie data={(staffData.categories || []).map((c: StaffCategory) => ({ label: c.label, value: Object.values(c.metrics || {}).reduce((s: number, v: number) => s + v, 0) }))} dataKey="value" nameKey="label" innerRadius={50} outerRadius={90}>
+                    {(staffData.categories || []).map((_: StaffCategory, idx: number) => (
                       <Cell key={idx} fill={COLORS[idx % COLORS.length]} />
                     ))}
                   </Pie>
@@ -293,11 +330,11 @@ export default function AdminAnalyticsPage() {
 
             <ChartCard title="Month-wise Activity (proxy)" subtitle="Bar Chart">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={(staffData.categories||[]).map((c:any)=>({ label:c.label, value: Object.values(c.metrics||{}).reduce((s:any,v:any)=> s + (typeof v==='number'? v : 0),0) }))}>
+                <BarChart data={(staffData.categories || []).map((c: StaffCategory) => ({ label: c.label, value: Object.values(c.metrics || {}).reduce((s: number, v: number) => s + v, 0) }))}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
                   <XAxis dataKey="label" stroke="#9ca3af" />
                   <YAxis stroke="#9ca3af" />
-                  <Tooltip contentStyle={{ background:'#0f172a', border:'1px solid #334155', color:'#e5e7eb' }} />
+                  <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid #334155', color: '#e5e7eb' }} />
                   <Legend />
                   <Bar dataKey="value" name="Activity" fill="#f472b6" />
                 </BarChart>

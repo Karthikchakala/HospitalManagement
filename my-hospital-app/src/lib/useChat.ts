@@ -19,8 +19,16 @@ export type JoinPayload = {
   senderId: number;
 };
 
+export type ChatMessage = {
+  message_id?: string | number;
+  sender_id: number;
+  sender_type: SenderType;
+  message: string;
+  created_at?: string | number;
+};
+
 export function useChat(serverUrl: string, joinPayload: JoinPayload) {
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [typingFrom, setTypingFrom] = useState<number | null>(null);
 
   const socket: Socket = useMemo(() => io(serverUrl, {
@@ -36,21 +44,21 @@ export function useChat(serverUrl: string, joinPayload: JoinPayload) {
     const onConnect = () => {
       socket.emit('join_room', joinPayload);
     };
-    const onConnectError = (err: any) => {
-      console.error('socket connect_error', err?.message || err);
+    const onConnectError = (err: unknown) => {
+      console.error('socket connect_error', err instanceof Error ? err.message : err);
     };
-    const onError = (err: any) => {
-      console.error('socket error', err?.message || err);
+    const onError = (err: unknown) => {
+      console.error('socket error', err instanceof Error ? err.message : err);
     };
-    const onHistory = (data: any) => {
+    const onHistory = (data: { messages: ChatMessage[] }) => {
       setMessages(data?.messages || []);
     };
-    const onNewMessage = (data: any) => {
+    const onNewMessage = (data: { message: ChatMessage }) => {
       setMessages(prev => [...prev, data.message]);
     };
-    const onTyping = (data: any) => setTypingFrom(data?.from || null);
+    const onTyping = (data: { from: number }) => setTypingFrom(data?.from || null);
     const onStopTyping = () => setTypingFrom(null);
-    const onErrorMsg = (e: any) => console.error('chat error', e);
+    const onErrorMsg = (e: unknown) => console.error('chat error', e);
 
     socket.on('connect', onConnect);
     socket.on('connect_error', onConnectError);
@@ -74,7 +82,7 @@ export function useChat(serverUrl: string, joinPayload: JoinPayload) {
       socket.off('stop_typing', onStopTyping);
       socket.off('error_message', onErrorMsg);
     };
-  }, [socket, JSON.stringify(joinPayload)]);
+  }, [socket, joinPayload]);
 
   const sendMessage = (payload: {
     message: string;

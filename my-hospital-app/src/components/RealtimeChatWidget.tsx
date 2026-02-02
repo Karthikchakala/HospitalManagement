@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useChat, JoinPayload } from '../lib/useChat';
+import { useChat, JoinPayload, ChatMessage } from '../lib/useChat';
 
 const defaultServer = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
 
@@ -24,7 +24,7 @@ function ChatRoom({ serverUrl, join }: { serverUrl: string; join: JoinPayload })
         <span className="ml-2 text-xs text-gray-400">room auto-selected from context</span>
       </div>
       <div className="flex-1 overflow-y-auto p-3 space-y-2 bg-slate-950/70">
-        {messages.map((m: any) => (
+        {messages.map((m: ChatMessage) => (
           <div key={m.message_id || `${m.sender_id}-${m.created_at}`} className={`flex ${String(m.sender_type) === join.senderType ? 'justify-end' : 'justify-start'}`}>
             <div className={`max-w-[80%] rounded-xl px-3 py-2 text-sm shadow ${String(m.sender_type) === join.senderType ? 'bg-cyan-500/20 text-cyan-100 border border-cyan-600/50' : 'bg-slate-900/70 text-gray-100 border border-cyan-700/40'}`}>
               <p className="whitespace-pre-wrap">{m.message}</p>
@@ -78,7 +78,7 @@ export default function RealtimeChatWidget() {
           setPatientId(pid || 0);
           setPatientName(data?.name || 'Patient');
         }
-      } catch {}
+      } catch { }
       finally {
         setLoading(false);
       }
@@ -92,10 +92,10 @@ export default function RealtimeChatWidget() {
         const res = await fetch(`${defaultServer}/api/doctors`);
         if (res.ok) {
           const body = await res.json();
-          const list = (body?.data || []).map((d: any) => ({ doctor_id: d.doctor_id, doctor_name: d.doctor_name }));
+          const list = (body?.data || []).map((d: Record<string, unknown>) => ({ doctor_id: d.doctor_id, doctor_name: d.doctor_name }));
           setDoctors(list);
         }
-      } catch {}
+      } catch { }
     })();
   }, []);
 
@@ -128,7 +128,7 @@ export default function RealtimeChatWidget() {
             <input
               list="doctorNames"
               value={doctorName}
-              onChange={e=>setDoctorName(e.target.value)}
+              onChange={e => setDoctorName(e.target.value)}
               placeholder="Type doctor's name"
               className="flex-1 rounded border border-cyan-700/40 bg-slate-900/70 px-2 py-1 text-sm"
             />

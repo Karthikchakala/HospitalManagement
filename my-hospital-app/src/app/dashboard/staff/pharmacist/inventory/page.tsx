@@ -394,7 +394,7 @@ export default function PharmacistInventoryPage() {
 
         {/* Edit modal */}
         {editItem && (() => {
-          const d: any = parseDetails(editItem.medicine_details); return (
+          const d = parseDetails(editItem.medicine_details); return (
             <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40">
               <div className="w-[92%] max-w-lg rounded-lg bg-white p-5 shadow-xl ring-1 ring-slate-200">
                 <h3 className="mb-3 text-lg font-semibold text-slate-800">Edit Medicine</h3>

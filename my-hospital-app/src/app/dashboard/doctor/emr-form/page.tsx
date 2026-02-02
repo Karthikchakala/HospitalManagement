@@ -93,7 +93,7 @@ export default function NewEMRPage() {
         }
       }
     } catch { }
-  }, [storageKeys.draft]);
+  }, [storageKeys.draft, selectedPatientId]);
 
   useEffect(() => {
     if (!doctorId || !selectedPatientId) return;
@@ -426,7 +426,7 @@ export default function NewEMRPage() {
 
               {uploadStatus && (
                 <p className={`mt-2 text-sm ${uploadStatus.includes('Complete') ? 'text-emerald-400' :
-                    uploadStatus.includes('Failed') ? 'text-rose-400' : 'text-cyan-300'
+                  uploadStatus.includes('Failed') ? 'text-rose-400' : 'text-cyan-300'
                   }`}>{uploadStatus}</p>
               )}
 
@@ -436,7 +436,7 @@ export default function NewEMRPage() {
 
                   {/* Preview Button */}
                   <a
-                    href={uploadedFile.url}
+                    href={uploadedFile.url as string}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="underline text-cyan-400 hover:text-cyan-300"
@@ -446,7 +446,7 @@ export default function NewEMRPage() {
 
                   {/* Download Button */}
                   <a
-                    href={uploadedFile.url}
+                    href={uploadedFile.url as string}
                     download
                     className="underline text-green-400 hover:text-green-300"
                   >
@@ -483,8 +483,17 @@ export default function NewEMRPage() {
   );
 }
 
-function VersionList({ storageKey, onRestore }: { storageKey: string; onRestore: (v: any) => void; }) {
-  const [versions, setVersions] = useState<any[]>([]);
+interface EmrVersion {
+  patientId: string;
+  diagnosis: string;
+  prescriptions: string;
+  notes: string;
+  uploadedFile: Record<string, unknown> | null;
+  at: string;
+}
+
+function VersionList({ storageKey, onRestore }: { storageKey: string; onRestore: (v: EmrVersion) => void; }) {
+  const [versions, setVersions] = useState<EmrVersion[]>([]);
   useEffect(() => {
     try {
       const raw = localStorage.getItem(storageKey);
@@ -506,3 +515,4 @@ function VersionList({ storageKey, onRestore }: { storageKey: string; onRestore:
     </div>
   );
 }
+

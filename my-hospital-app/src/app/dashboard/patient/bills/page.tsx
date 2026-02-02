@@ -5,9 +5,37 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 
+interface RazorpayResponse {
+    razorpay_payment_id: string;
+    razorpay_order_id: string;
+    razorpay_signature: string;
+}
+
+interface RazorpayOptions {
+    key: string;
+    amount: number;
+    currency: string;
+    name: string;
+    description?: string;
+    image?: string;
+    order_id: string;
+    handler: (response: RazorpayResponse) => void;
+    prefill?: {
+        name?: string;
+        email?: string;
+        contact?: string;
+    };
+    theme?: {
+        color?: string;
+    };
+    modal?: {
+        ondismiss?: () => void;
+    };
+}
+
 declare global {
     interface Window {
-        Razorpay: new (options: any) => { open: () => void };
+        Razorpay: new (options: RazorpayOptions) => { open: () => void };
     }
 }
 
@@ -214,10 +242,10 @@ export default function PatientBillsPage() {
                                             </td>
                                             <td className="px-4 md:px-6 py-4 text-center">
                                                 <span className={`px-3 py-1 inline-flex text-xs md:text-sm font-bold rounded-full ${bill.status === 'Paid'
-                                                        ? 'bg-emerald-500/30 text-emerald-200 border border-emerald-400/50'
-                                                        : isUnpaid(bill.status)
-                                                            ? 'bg-red-500/30 text-red-200 border border-red-400/50'
-                                                            : 'bg-amber-500/30 text-amber-200 border border-amber-400/50'
+                                                    ? 'bg-emerald-500/30 text-emerald-200 border border-emerald-400/50'
+                                                    : isUnpaid(bill.status)
+                                                        ? 'bg-red-500/30 text-red-200 border border-red-400/50'
+                                                        : 'bg-amber-500/30 text-amber-200 border border-amber-400/50'
                                                     }`}>
                                                     {bill.status}
                                                 </span>

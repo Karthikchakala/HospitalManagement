@@ -133,15 +133,15 @@ export default function HospifyChatbot() {
     return undefined;
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const mapDoctor = (d: any): Doctor => {
+
+  const mapDoctor = (d: Record<string, unknown>): Doctor => {
     const visiting = d.schedule ? String(d.schedule) : [d.availability_date, d.availability_time].filter(Boolean).join(" ");
     return {
       id: String(d.doctor_id),
-      name: d.name,
-      specialization: d.specialization || undefined,
+      name: String(d.name),
+      specialization: (d.specialization as string) || undefined,
       visiting: visiting || undefined,
-      departmentId: d.department_id ?? undefined,
+      departmentId: (d.department_id as string | number) ?? undefined,
     };
   };
 
@@ -177,8 +177,8 @@ export default function HospifyChatbot() {
         console.error('Error fetching departments:', error);
         return [];
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return (data || []).map((d: any) => ({ id: d.department_id, name: d.name }));
+
+      return (data || []).map((d: Record<string, unknown>) => ({ id: d.department_id as string | number, name: d.name as string }));
     } catch (e) {
       console.error('Departments fetch failed:', e);
       return [];
@@ -194,13 +194,13 @@ export default function HospifyChatbot() {
         console.error('Error fetching doctors:', error);
         return [];
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return (data || []).map((d: any) => ({
+
+      return (data || []).map((d: Record<string, unknown>) => ({
         id: String(d.doctor_id ?? uid()),
-        name: d.name,
-        specialization: d.specialization || undefined,
+        name: d.name as string,
+        specialization: (d.specialization as string) || undefined,
         visiting: d.schedule ? String(d.schedule) : [d.availability_date, d.availability_time].filter(Boolean).join(' '),
-        departmentId: d.department_id ?? undefined,
+        departmentId: (d.department_id as string | number) ?? undefined,
       }));
     } catch (e) {
       console.error('Doctors fetch failed:', e);
@@ -220,8 +220,8 @@ export default function HospifyChatbot() {
         const { data, error } = await supabase
           .from("Doctor")
           .select("doctor_id, name, schedule, availability_time, availability_date, department_id")
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          .eq("department_id", filterId as any)
+
+          .eq("department_id", filterId)
           .limit(20);
         console.log('[Hospify] doctors query result:', { error, count: data?.length, sample: data?.[0] });
         if (!error && data && data.length) {
@@ -689,8 +689,8 @@ export default function HospifyChatbot() {
               <div key={m.id} className={`flex ${m.from === "user" ? "justify-end" : "justify-start"}`}>
                 <div
                   className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm shadow-md ${m.from === "user"
-                      ? "bg-cyan-500/20 text-cyan-100 border border-cyan-600/50"
-                      : "bg-slate-900/70 text-gray-100 border border-cyan-700/40"
+                    ? "bg-cyan-500/20 text-cyan-100 border border-cyan-600/50"
+                    : "bg-slate-900/70 text-gray-100 border border-cyan-700/40"
                     }`}
                 >
                   {m.text && <p className="whitespace-pre-wrap">{m.text}</p>}

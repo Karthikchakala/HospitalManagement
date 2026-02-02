@@ -266,9 +266,7 @@ export default function PatientMedicalHistoryPage() {
                           {(record.file_links as FileLink[]).map(
                             (file, index) => {
                               const isPDF = file.url.endsWith('.pdf');
-                              const isImage = /\.(jpg|jpeg|png|gif)$/i.test(
-                                file.url
-                              );
+                              // const isImage = /\.(jpg|jpeg|png|gif)$/i.test(file.url);
                               return (
                                 <div
                                   key={index}

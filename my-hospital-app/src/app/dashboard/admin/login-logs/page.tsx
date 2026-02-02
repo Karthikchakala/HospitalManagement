@@ -18,6 +18,15 @@ interface LogEntry {
     ip_address: string;
 }
 
+interface LogsParams {
+    startDate?: string;
+    endDate?: string;
+    action?: string;
+    page: number;
+    pageSize: number;
+    format?: string;
+}
+
 export default function AdminLoginLogsPage() {
     const router = useRouter();
     const [logs, setLogs] = useState<LogEntry[]>([]);
@@ -44,12 +53,14 @@ export default function AdminLoginLogsPage() {
         setIsLoading(true);
         setErrorMsg(null);
         try {
-            const params: any = {};
+            const params: LogsParams = {
+                page,
+                pageSize
+            };
             if (startDate) params.startDate = startDate;
             if (endDate) params.endDate = endDate;
-            if (actionFilter) params.action = actionFilter;
-            params.page = page;
-            params.pageSize = pageSize;
+            if (actionFilter && actionFilter !== 'All') params.action = actionFilter;
+
             const response = await axios.get('http://localhost:5000/api/admin/logs', {
                 headers: { Authorization: `Bearer ${token}` },
                 params,
@@ -79,19 +90,22 @@ export default function AdminLoginLogsPage() {
         const token = localStorage.getItem('token');
         if (!token) { router.push('/login'); return; }
         try {
-            const params: any = {};
+            const params: LogsParams = {
+                page,
+                pageSize,
+                format: 'csv'
+            };
             if (startDate) params.startDate = startDate;
             if (endDate) params.endDate = endDate;
-            if (actionFilter) params.action = actionFilter;
-            params.page = page;
-            params.pageSize = pageSize;
-            params.format = 'csv';
+            if (actionFilter && actionFilter !== 'All') params.action = actionFilter;
+
             const resp = await axios.get('http://localhost:5000/api/admin/logs', {
                 headers: { Authorization: `Bearer ${token}` },
                 params,
                 responseType: 'blob',
             });
             const blob = new Blob([resp.data], { type: 'text/csv' });
+
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
@@ -261,8 +275,8 @@ export default function AdminLoginLogsPage() {
                                                 <tr
                                                     key={log.log_id}
                                                     className={`border-b border-slate-700/50 transition-all duration-200 ${isFailed
-                                                            ? 'bg-rose-500/15 hover:bg-rose-500/25'
-                                                            : 'hover:bg-slate-700/30'
+                                                        ? 'bg-rose-500/15 hover:bg-rose-500/25'
+                                                        : 'hover:bg-slate-700/30'
                                                         }`}
                                                 >
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -275,10 +289,10 @@ export default function AdminLoginLogsPage() {
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                                                         <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full font-bold ${isFailed
-                                                                ? 'bg-rose-500/30 text-rose-200 border-2 border-rose-400/60 shadow-lg shadow-rose-500/30'
-                                                                : isSuccess
-                                                                    ? 'bg-emerald-500/30 text-emerald-200 border-2 border-emerald-400/60 shadow-lg shadow-emerald-500/30'
-                                                                    : 'bg-blue-500/30 text-blue-200 border-2 border-blue-400/60 shadow-lg shadow-blue-500/30'
+                                                            ? 'bg-rose-500/30 text-rose-200 border-2 border-rose-400/60 shadow-lg shadow-rose-500/30'
+                                                            : isSuccess
+                                                                ? 'bg-emerald-500/30 text-emerald-200 border-2 border-emerald-400/60 shadow-lg shadow-emerald-500/30'
+                                                                : 'bg-blue-500/30 text-blue-200 border-2 border-blue-400/60 shadow-lg shadow-blue-500/30'
                                                             }`}>
                                                             {isFailed ? (
                                                                 <ShieldExclamationIcon className="w-4 h-4" />

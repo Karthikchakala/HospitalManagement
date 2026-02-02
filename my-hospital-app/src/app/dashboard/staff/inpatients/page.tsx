@@ -46,11 +46,11 @@ export default function StaffInpatientsPage() {
           supabase.from("Doctor").select("doctor_id, name, department_id").order("name"),
         ]);
 
-        let docData: any[] | null | undefined = docRes.data;
+        let docData: Record<string, unknown>[] | null = (docRes.data as Record<string, unknown>[] | null);
         // Fallback to plural table name if needed
         if (!docData || docData.length === 0) {
           const alt = await supabase.from("Doctors").select("doctor_id, name, department_id, full_name, doctor_name").order("name");
-          docData = alt.data || [];
+          docData = (alt.data as Record<string, unknown>[] | null) || [];
         }
 
         // Normalize doctors to expected shape
@@ -59,6 +59,7 @@ export default function StaffInpatientsPage() {
           name: (d.name as string) ?? (d.full_name as string) ?? (d.doctor_name as string) ?? `Doctor ${d.doctor_id ?? d.id ?? ''}`,
           department_id: (d.department_id as number) ?? (d.departmentId as number) ?? null,
         }));
+
 
         setDepartments((depData || []) as Department[]);
         setDoctors(normalizedDoctors);
@@ -115,7 +116,7 @@ export default function StaffInpatientsPage() {
       setForm({ patient_id: "", doctor_id: "", department_id: "", room_number: "", ward_type: "General", diagnosis: "", treatment_plan: "" });
       await fetchList();
       alert("Patient Admitted Successfully");
-    } catch (e: any) {
+    } catch (e: unknown) {
       const msg = axios.isAxiosError(e) ? e.response?.data?.error : "Failed to admit";
       alert(msg);
     } finally {
@@ -128,7 +129,7 @@ export default function StaffInpatientsPage() {
       await axios.put(`http://localhost:5000/api/staff/inpatients/discharge/${id}`);
       await fetchList();
       alert("Patient Discharged");
-    } catch (e: any) {
+    } catch (e: unknown) {
       const msg = axios.isAxiosError(e) ? e.response?.data?.error : "Failed to discharge";
       alert(msg);
     }

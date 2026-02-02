@@ -1,8 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Map from '../components/Map';

@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabaseServer';
 
 // PUT /api/staff/inventory/:id → update quantity or price
-export async function PUT(_req: Request, { params }: { params: { id: string } }) {
+export async function PUT(_req: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     const idNum = Number(params.id);
     if (!idNum || Number.isNaN(idNum)) {
@@ -89,7 +90,8 @@ export async function PUT(_req: Request, { params }: { params: { id: string } })
 }
 
 // DELETE /api/staff/inventory/:id → delete a medicine
-export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(_req: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     const idNum = Number(params.id);
     if (!idNum || Number.isNaN(idNum)) {

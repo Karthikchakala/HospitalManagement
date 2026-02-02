@@ -1,0 +1,25 @@
+
+> my-hospital-app@0.1.0 lint
+> eslint --quiet
+
+
+C:\Users\karth\Downloads\HMS-main_2\my-hospital-app\src\app\dashboard\patient\appointments\page.tsx
+  177:43  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  302:35  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  315:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  460:34  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\karth\Downloads\HMS-main_2\my-hospital-app\src\app\dashboard\patient\bills\page.tsx
+  16:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\karth\Downloads\HMS-main_2\my-hospital-app\src\app\dashboard\patient\home-visit\page.tsx
+  15:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\karth\Downloads\HMS-main_2\my-hospital-app\src\components\DoctorChatWidget.tsx
+  157:177  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\karth\Downloads\HMS-main_2\my-hospital-app\src\components\PatientChatWidget.tsx
+  217:177  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 8 problems (8 errors, 0 warnings)
+

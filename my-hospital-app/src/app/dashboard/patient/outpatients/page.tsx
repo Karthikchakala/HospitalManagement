@@ -92,7 +92,7 @@ export default function OutpatientsPage() {
       setForm({ patient_id: "", doctor_id: "", department_id: "", visit_date: "", appointment_time: "", symptoms: "", consultation_fee: "", payment_status: "Pending" });
       await fetchList();
       alert("Appointment Booked Successfully");
-    } catch (e: any) {
+    } catch (e: unknown) {
       const msg = axios.isAxiosError(e) ? e.response?.data?.error : "Failed to book appointment";
       alert(msg);
     } finally {
