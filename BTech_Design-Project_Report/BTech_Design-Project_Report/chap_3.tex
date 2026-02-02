@@ -1,0 +1,35 @@
+% Chapter Template
+
+\chapter{System Architecture and Database Design} % Main chapter title
+
+\label{Chapter3} % Change X to a consecutive number; for referencing this chapter elsewhere, use \ref{Chapter3}
+
+\lhead{Chapter 3. \emph{System Architecture and Database Design}} % Change X to a consecutive number; this is for the header on each page - perhaps a shortened title
+
+%----------------------------------------------------------------------------------------
+%	SECTION 1
+%----------------------------------------------------------------------------------------
+
+\section{System Architecture Overview}
+
+System architecture: The HMS follows a modular, service-oriented design. The frontend is built with Next.js (React + TypeScript) and Tailwind CSS for responsive UI. The backend uses Node.js/Express with RESTful endpoints grouped by role (patient, doctor, staff, admin). Supabase (Postgres) provides secure relational storage and row-level filters. Authentication and authorization use JWT; emails are sent via Nodemailer; Razorpay powers payments; WebRTC enables real-time video for virtual appointments.
+
+%-----------------------------------
+%	SUBSECTION 1
+%-----------------------------------
+\subsection{Backend Services and APIs}
+Backend services and APIs: Endpoints are organized under `/api/patient`, `/api/doctor`, `/api/staff`, and `/api/admin`. Middleware handles JWT verification and role checks. Appointment flows unify in-person and virtual visits; billing integrates at booking and service completion. Analytics endpoints under `/api/admin/analytics/*` aggregate revenue, visits, and performance with date filters and grouping.
+
+%-----------------------------------
+%	SUBSECTION 2
+%-----------------------------------
+
+\subsection{Database Design}
+Database design: Core tables include `User`, `Patient`, `Doctor`, `Staff`, `Appointments`, `VirtualAppointments`, `Billing`, `Departments`, `LabTests`, `Pharmacy`, `HomeVisit`, `EMR`, and `AuditLogs`. Foreign keys link patients and doctors to appointments and bills; status fields capture workflow state; timestamps support analytics windows and auditing.
+
+%----------------------------------------------------------------------------------------
+%	SECTION 2
+%----------------------------------------------------------------------------------------
+
+\section{Deployment and Configuration}
+Deployment and configuration: Environment variables define endpoints and URLs (e.g., \texttt{NEXT\_PUBLIC\_BACKEND\_BASE\_URL} for the frontend and \texttt{FRONTEND\_BASE} for backend-generated links). The system supports local development with hot reload and can be containerized for production. Logging and error handling surface actionable diagnostics without leaking sensitive data.

@@ -1,0 +1,435 @@
+\chapter{Complete Feature Documentation}
+\label{chap:features}
+
+\lhead{Chapter 8. \emph{Complete Feature Documentation}}
+
+This chapter presents a consolidated, module-centric documentation of the Hospital Management System (HMS). It integrates system design, analysis, workflows, backend APIs, database entities, and UI behaviors across Patient, Doctor, Admin, and Staff roles. The objective is to provide a single, coherent view of the complete feature set implemented in the application.
+
+\section{System Overview}
+\subsection{Architecture}
+\begin{itemize}
+  \item \textbf{Frontend}: Next.js (TypeScript, React), TailwindCSS, Recharts; JWT stored in browser storage; calls backend REST APIs.
+  \item \textbf{Backend}: Node.js (TypeScript), Express, Socket.IO (chat), Nodemailer (email), Razorpay (payments), in-memory signaling for WebRTC.
+  \item \textbf{Database}: Supabase (PostgreSQL) with Row-level security managed by backend; joins across \texttt{User}, \texttt{Patient}, \texttt{Doctor}, \texttt{Appointments}, \texttt{VirtualAppointments}, \texttt{Billing}, \texttt{Departments}, \texttt{LabTests}, \texttt{Pharmacy}, \texttt{HomeVisit}, \texttt{EMR}, \texttt{AuditLogs}, etc.
+  \item \textbf{Deployment}: Local dev on \texttt{http://localhost:3000} (frontend) and \texttt{http://localhost:5000} (backend). Env-based base URLs for building links.
+\end{itemize}
+
+\subsection{Cross-cutting Concerns}
+\begin{itemize}
+  \item \textbf{Authentication}: JWT with role claims (admin, doctor, patient, staff); protected routes enforce role-based authorization.
+  \item \textbf{Validation}: Request payload validation at route-handlers; defensive checks for IDs, dates, and status transitions.
+  \item \textbf{Auditing}: Selected actions recorded in \texttt{AuditLogs} and available in admin audit screens.
+  \item \textbf{Notifications}: Email (Nodemailer) for confirmations, reminders, lab results, invitations.
+\end{itemize}
+
+\section{Authentication and Role-Based Access}
+\subsection{Purpose}
+Secure system entry and controlled access to features and data.
+\subsection{Technologies}
+Express middleware (\texttt{protect}), JWT, Supabase user records.
+\subsection{Key APIs}
+\begin{itemize}
+  \item \texttt{POST /api/auth/login} (returns JWT with role)
+  \item \texttt{GET /api/admin/profile}, \texttt{/api/doctor/profile}, \texttt{/api/patient/profile} (role-gated)
+\end{itemize}
+\subsection{Database Tables}
+\texttt{User} (role), \texttt{Patient}, \texttt{Doctor}, \texttt{Staff}.
+\subsection{UI Workflow}
+\begin{verbatim}
+Login -> Verify credentials -> Issue JWT -> Store -> Redirect to role dashboard
+Admin -> /dashboard/admin | Doctor -> /dashboard/doctor | Patient -> /dashboard/patient
+\end{verbatim}
+\subsection{Permissions}
+\begin{itemize}
+  \item Admin: full administrative features, analytics, settings.
+  \item Doctor: own appointments, EMR, chat, virtual consult.
+  \item Patient: booking, history, billing, chat, virtual consult.
+  \item Staff: reception (appointments), pharmacy, lab modules.
+\end{itemize}
+
+\section{Appointment Management}
+\subsection{Purpose}
+Enable patients to book, cancel, or reschedule appointments with doctors; allow doctors/staff to manage status.
+\subsection{Technologies}
+Next.js UI, Express routes, Supabase joins.
+\subsection{Key APIs}
+\begin{itemize}
+  \item \texttt{GET /api/patient/appointments/departments}
+  \item \texttt{GET /api/patient/appointments/doctors/:departmentId}
+  \item \texttt{GET /api/patient/appointments/times/:doctorId/:date}
+  \item \texttt{POST /api/patient/appointments} (book \& auto-bill paid)
+  \item \texttt{GET /api/patient/appointments/upcoming} (normalized list)
+  \item \texttt{PATCH /api/patient/appointments/:type/:id/cancel}
+  \item Staff daily view: \texttt{GET /api/staff/appointments/today}
+\end{itemize}
+\subsection{Database Tables}
+\texttt{Appointments}, \texttt{Doctor}, \texttt{Patient}, \texttt{Billing}, \texttt{Departments}.
+\subsection{UI Workflow}
+\begin{verbatim}
+Patient: Select Dept -> Select Doctor -> Pick Date/Time -> Pay -> Confirm
+Doctor: View schedule -> Complete visits -> Update status
+Staff: View day sheet -> Check-in/No-Show/Completed
+\end{verbatim}
+\subsection{Role Permissions}
+Patients can create/cancel own bookings; Doctors update status of own appointments; Staff manage schedule logistics.
+
+\subsection{Appointment Flow (Diagram)}
+\begin{verbatim}
+[Patient] --selects--> [Department] --chooses--> [Doctor] --picks--> [Slot]
+   |                             |                         |
+   +-----> [POST /appointments] --(create)--> [Appointments + Billing]
+                                       |
+                                 [Email/SMS confirm]
+\end{verbatim}
+
+\section{Virtual Consultation (WebRTC)}
+\subsection{Purpose}
+Real-time video consultations between patient and doctor.
+\subsection{Technologies}
+WebRTC (browser), custom signaling (Express endpoints), email invitation, Socket endpoints not mandatory for signaling.
+\subsection{Key APIs}
+\begin{itemize}
+  \item Signaling: \texttt{/api/video/room/:id (GET/POST/DELETE)} for offer/answer/candidates
+  \item Invite: \texttt{POST /api/video/invite} -> sends meeting link to patient \& doctor
+\end{itemize}
+\subsection{Database Tables}
+\texttt{VirtualAppointments} (date, time, doctor, patient, status, optional link), \texttt{Doctor}, \texttt{Patient}.
+\subsection{UI Workflow}
+\begin{verbatim}
+Patient pays -> Creates virtual appt -> Invite email -> Join /video/:roomId at time
+Doctor receives email -> Joins room -> Conducts consultation
+\end{verbatim}
+\subsection{Permissions}
+Only participants (patient/doctor) can access the room link; URL points to frontend site.
+
+\section{Chat System}
+\subsection{Purpose}
+Asynchronous messaging between patient and doctor for pre/post consultation clarifications.
+\subsection{Technologies}
+Socket.IO for real-time events, REST for history.
+\subsection{Database Tables}
+\texttt{ChatMessages}, \texttt{User} (by role), mapping tables for participants if present.
+\subsection{UI/Flow (Diagram)}
+\begin{verbatim}
+[User] --connects--> [Socket.IO] --join room--> [patient_doctor_room]
+   |                                         |
+ send message ------------------------------->|-- store & broadcast --> peers
+\end{verbatim}
+\subsection{Permissions}
+Only assigned/related users can join corresponding rooms.
+
+\section{Notifications}
+\subsection{Purpose}
+Keep users informed: booking confirmations, reminders, lab results, virtual consult invites.
+\subsection{Technologies}
+Nodemailer (SMTP), scheduled jobs for reminders.
+\subsection{Key APIs}
+\begin{itemize}
+  \item \texttt{POST /api/video/invite} (emails both patient \& doctor)
+  \item Reminder jobs: appointment, virtual appointment, home visit
+\end{itemize}
+\subsection{Database}
+Reads from \texttt{Appointments}, \texttt{VirtualAppointments}, \texttt{HomeVisit}, and user email fields via joins.
+
+\section{Pharmacy Module}
+\subsection{Purpose}
+Dispense prescriptions and generate associated bills.
+\subsection{Technologies}
+Staff UI (pharmacist), Express routes, Supabase.
+\subsection{Key APIs}
+\begin{itemize}
+  \item \texttt{GET /api/staff/pharmacy/pending} (appointments awaiting dispensing)
+  \item \texttt{PUT /api/staff/pharmacy/dispense/:appointmentId} (marks dispensed and creates bill)
+  \item \texttt{GET /api/staff/pharmacy/medicines} (catalog)
+\end{itemize}
+\subsection{Database Tables}
+\texttt{Appointments}, \texttt{EMR} (prescriptions), \texttt{Billing}, \texttt{Pharmacy}, \texttt{Patient}, \texttt{Doctor}.
+\subsection{UI Workflow}
+\begin{verbatim}
+Pharmacist: Pending -> View latest EMR -> Dispense -> Auto-generate Bill (Unpaid)
+Patient: Pays later via billing module; receives receipt email on payment
+\end{verbatim}
+\subsection{Permissions}
+Pharmacist (staff role) only; enforced via middleware (role check).
+
+\section{Laboratory Module}
+\label{sec:laboratory-module}
+\subsection{Purpose}
+Track tests, submit results, notify patients.
+\subsection{Technologies}
+Staff UI (lab), Express, Supabase joins to \texttt{TestsCatalog}, \texttt{Patient->User}.
+\subsection{Key APIs}
+\begin{itemize}
+  \item \texttt{GET /api/staff/lab/pending}
+  \item \texttt{PUT /api/staff/lab/result/:testId} (submit results and email patient)
+  \item \texttt{GET /api/staff/lab/samples}
+\end{itemize}
+\subsection{Database Tables}
+\texttt{LabTests} (with \texttt{test\_catalog\_id}), \texttt{Patient}, \texttt{User}, \texttt{Billing} (diagnostics revenue), \texttt{TestsCatalog}.
+\subsection{UI Workflow}
+\begin{verbatim}
+Lab: Pending list -> Enter results -> Mark Completed -> Email patient w/ result summary
+\end{verbatim}
+\subsection{Permissions}
+Lab staff only; results append to patient record context.
+
+\section{Billing and Payments}
+\subsection{Purpose}
+Record service charges, mark payment status, generate receipts.
+\subsection{Technologies}
+Razorpay for online payment (where used), Nodemailer for receipts, Express routes.
+\subsection{Key APIs}
+\begin{itemize}
+  \item \texttt{GET /api/patient/bills} (list)
+  \item \texttt{PUT /api/patient/bills/:billId/pay} (mark Paid; send receipt)
+  \item Auto-billing on booking: \texttt{POST /api/patient/appointments} inserts a Paid consultation bill
+\end{itemize}
+\subsection{Database Tables}
+\texttt{Billing} (\texttt{total\_amount}, \texttt{status}, \texttt{payment\_date}, \texttt{payment\_method}), \texttt{Appointments}, \texttt{Patient}.
+\subsection{UI Workflow}
+\begin{verbatim}
+Patient: View bills -> Pay -> Email receipt
+Staff/Modules: Create bills (dispense, inpatient, home visit) -> Patients settle later
+\end{verbatim}
+\subsection{Permissions}
+Patients can view/pay own bills; staff can create module-driven bills (pharmacy, inpatient, home visit).
+
+\section{Home Visit}
+\subsection{Purpose}
+Book at-home healthcare services (Doctor/Nurse/Physiotherapist/Caregiver), optionally assign doctor.
+\subsection{Technologies}
+Express routes, email confirmation, dedicated table.
+\subsection{Key APIs}
+\begin{itemize}
+  \item \texttt{POST /api/home-visit/create-bill} (pre-payment bill)
+  \item \texttt{POST /api/home-visit} (booking)
+  \item \texttt{GET /api/home-visit} (filters: patient, assigned, service type)
+  \item \texttt{PATCH /api/home-visit/:id} (status/assignment)
+\end{itemize}
+\subsection{Database Tables}
+\texttt{HomeVisit} (\texttt{service\_type}, \texttt{assigned\_id}, \texttt{visit\_date/time}, \texttt{status}), \texttt{Patient}, \texttt{Doctor}.
+\subsection{UI Workflow}
+\begin{verbatim}
+Patient: Choose service -> Provide date/time/address -> (Optional) Assigned doctor -> Confirmation email
+Admin/Coordinator: Update assignment/status as needed
+\end{verbatim}
+
+\section{Administrative Analytics and Dashboards}
+\subsection{Purpose}
+Provide revenue, patient visits, and staff activity insights with filters (day/week/month/year/custom).
+\subsection{Technologies}
+Backend aggregation endpoints (TypeScript + Supabase), Next.js UI with Recharts, Tailwind grid layout.
+\subsection{Key APIs}
+\begin{itemize}
+  \item \texttt{GET /api/admin/analytics/revenue}
+  \item \texttt{GET /api/admin/analytics/revenue/department}
+  \item \texttt{GET /api/admin/analytics/patients/department}
+  \item \texttt{GET /api/admin/analytics/patients/doctor}
+  \item \texttt{GET /api/admin/analytics/staff/performance}
+\end{itemize}
+\subsection{Database Tables}
+\texttt{Billing}, \texttt{Appointments}, \texttt{VirtualAppointments}, \texttt{Doctor}, \texttt{Departments}, \texttt{LabTests}.
+\subsection{UI Workflow}
+\begin{verbatim}
+Filters (period/range) -> Fetch datasets -> Render charts (bar/line/pie/area)
+Revenue by Dept | Trends over time | Top 10 busy doctors | Staff contribution
+\end{verbatim}
+\subsection{Analytics Flow (Diagram)}
+\begin{verbatim}
+[Admin UI] -> set filters -> call /api/admin/analytics/*
+    -> aggregate in DB (GROUP BY, date filters) -> return chart-ready JSON
+    -> render Recharts in responsive cards
+\end{verbatim}
+
+\section{Doctor Module}
+\subsection{Purpose}
+Manage schedules, complete appointments, update EMR, review chat, and join virtual consultations.
+\subsection{Key APIs}
+\begin{itemize}
+  \item \texttt{GET /api/doctor/appointments}
+  \item \texttt{PUT /api/doctor/appointments/:appointmentId/complete}
+  \item \texttt{GET /api/doctor/patients}
+\end{itemize}
+\subsection{Database}
+\texttt{Appointments}, \texttt{EMR}, \texttt{Patient->User} joins.
+\subsection{UI Workflow}
+\begin{verbatim}
+Doctor: View upcoming -> Complete visits -> EMR notes -> Respond to chat -> Join /video/:id
+\end{verbatim}
+
+\section{Patient Module}
+\subsection{Purpose}
+Self-service booking, medical history, billing, chat, and virtual consult access.
+\subsection{Key APIs}
+\begin{itemize}
+  \item \texttt{GET /api/patient/medical-history}
+  \item \texttt{GET /api/patient/bills}, \texttt{PUT /api/patient/bills/:billId/pay}
+  \item \texttt{GET /api/patient/appointments/upcoming}
+\end{itemize}
+\subsection{Database}
+\texttt{EMR}, \texttt{Billing}, \texttt{Appointments}, \texttt{VirtualAppointments}.
+\subsection{UI Workflow}
+\begin{verbatim}
+Patient: Dashboard -> Book/Manage appointments -> Pay bills -> Join virtual consult -> Chat
+\end{verbatim}
+
+\section{Staff Module}
+\subsection{Purpose}
+Operational functions for receptionists, pharmacists, and laboratorists.
+\subsection{Key APIs}
+\begin{itemize}
+  \item Reception: \texttt{GET /api/staff/appointments/today}, \texttt{PATCH /api/staff/appointments/:id/status}
+  \item Pharmacy: see \S\ref{sec:pharmacy-module}
+  \item Lab: see \S\ref{sec:laboratory-module}
+\end{itemize}
+\subsection{Database}
+\texttt{Appointments}, \texttt{Billing}, \texttt{LabTests}, \texttt{Pharmacy}.
+
+\section{Workflows (Detailed Diagrams)}
+\subsection{Authentication Flow}
+\begin{verbatim}
+[User] -> /login -> POST /api/auth/login -> [JWT] -> store -> navigate to role dashboard
+\end{verbatim}
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[
+    scale=0.9,
+    every node/.style={transform shape},
+    node distance=1.6cm,
+    >=Latex,
+    box/.style={rectangle, rounded corners, draw=black!70, fill=white, very thick, inner sep=6pt, align=center},
+    io/.style={trapezium, trapezium left angle=60, trapezium right angle=120, draw=black!70, fill=white, very thick, inner sep=6pt, align=center}
+  ]
+    \node[io] (user) {User};
+    \node[box, right=of user] (login) {/login page};
+    \node[box, right=of login] (api) {POST /api/auth/login};
+    \node[box, right=of api] (jwt) {Issue JWT};
+    \node[box, right=of jwt] (guard) {Store + Route Guard};
+    \node[box, right=of guard] (dash) {Role Dashboard};
+    \draw[->] (user) -- (login);
+    \draw[->] (login) -- (api);
+    \draw[->] (api) -- (jwt);
+    \draw[->] (jwt) -- (guard);
+    \draw[->] (guard) -- (dash);
+  \end{tikzpicture}
+  \caption{Authentication flow \& route guarding}
+  \label{fig:auth-flow}
+\end{figure}
+\subsection{Chat Flow}
+\begin{verbatim}
+[Client] --connect--> [Socket Server]
+  |--join(room: patient_doctor)--> ok
+  |--emit('message', payload)-----> [server saves & broadcasts] -> peers receive
+\end{verbatim}
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[
+    scale=0.9,
+    every node/.style={transform shape},
+    node distance=2cm,
+    >=Latex,
+    box/.style={rectangle, rounded corners, draw=black!70, fill=white, very thick, inner sep=6pt, align=center}
+  ]
+    \node[box] (c1) {Client (Patient)};
+    \node[box, right=3cm of c1] (srv) {Socket.IO Server};
+    \node[box, right=3cm of srv] (c2) {Client (Doctor)};
+    \draw[->] (c1) -- node[above]{connect + join(room)} (srv);
+    \draw[->] (c2) -- node[above]{connect + join(room)} (srv);
+    \draw[<->, bend left=20] (c1) to node[above]{message events} (srv);
+    \draw[<->, bend left=20] (srv) to node[above]{broadcast} (c2);
+  \end{tikzpicture}
+  \caption{Chat workflow via Socket.IO rooms}
+  \label{fig:chat-flow}
+\end{figure}
+\subsection{Appointment Workflow}
+\begin{verbatim}
+Patient -> Dept -> Doctor -> Slot -> POST /appointments -> Billing (Paid)
+Doctor -> Complete -> EMR update -> Follow-up chat if needed
+\end{verbatim}
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[
+    scale=0.9,
+    every node/.style={transform shape},
+    node distance=1.8cm,
+    >=Latex,
+    box/.style={rectangle, rounded corners, draw=black!70, fill=white, very thick, inner sep=6pt, align=center}
+  ]
+    \node[box] (pat) {Patient};
+    \node[box, right=of pat] (dept) {Select Department};
+    \node[box, right=of dept] (doc) {Choose Doctor};
+    \node[box, right=of doc] (slot) {Pick Slot};
+    \node[box, below=1.6cm of slot] (post) {POST /api/patient/appointments};
+    \node[box, right=of post] (bill) {Appointments + Billing (Paid)};
+    \node[box, below=1.6cm of bill] (email) {Email/SMS Confirmation};
+    \draw[->] (pat) -- (dept);
+    \draw[->] (dept) -- (doc);
+    \draw[->] (doc) -- (slot);
+    \draw[->] (slot) -- (post);
+    \draw[->] (post) -- (bill);
+    \draw[->] (bill) -- (email);
+  \end{tikzpicture}
+  \caption{End-to-end appointment booking flow}
+  \label{fig:appt-flow}
+\end{figure}
+\subsection{Admin Analytics Workflow}
+\begin{verbatim}
+Admin picks period -> /api/admin/analytics/* -> Supabase aggregates -> Charts render
+\end{verbatim}
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[
+    node distance=2.2cm,
+    >=Latex,
+    box/.style={rectangle, rounded corners, draw=black!70, fill=white, very thick, inner sep=6pt, align=center}
+  ]
+    \node[box] (ui) {Admin UI (Filters)};
+    \node[box, right=of ui] (api) {/api/admin/analytics/*};
+    \node[box, right=of api] (agg) {Supabase Queries\newline (GROUP BY, date range)};
+    \node[box, right=of agg] (chart) {Chart-ready JSON $\rightarrow$ Recharts};
+    \draw[->] (ui) -- (api);
+    \draw[->] (api) -- (agg);
+    \draw[->] (agg) -- (chart);
+  \end{tikzpicture}
+  \caption{Analytics data flow from filters to charts}
+  \label{fig:analytics-flow}
+\end{figure}
+
+\section{APIs Summary (Representative)}
+\subsection{Public/Utility}
+\texttt{/api (doctors list, video signaling endpoints)}
+\subsection{Patient}
+\texttt{/api/patient} (profile, appointments, medical-history, billing, chat, status, manage appointments)
+\subsection{Doctor}
+\texttt{/api/doctor} (profile, appointments, EMR, chat, uploads)
+\subsection{Admin}
+\texttt{/api/admin} (doctors, patients, staff, departments, settings, analytics, audit)
+\subsection{Staff}
+\texttt{/api/staff} (profile, lab, pharmacy, daily appointments, inventory)
+
+\section{Database Entities (Selected)}
+\begin{itemize}
+  \item \textbf{User(user\_id, role, name, email, ...)} $\rightarrow$ links to \texttt{Patient}, \texttt{Doctor}, \texttt{Staff}.
+  \item \textbf{Patient(patient\_id, user\_id, ...)}, \textbf{Doctor(doctor\_id, user\_id, department\_id, ...)}
+  \item \textbf{Appointments(appointment\_id, patient\_id, doctor\_id, date, time, status)}
+  \item \textbf{VirtualAppointments(virtual\_appointment\_id, patient\_id, doctor\_id, appointment\_date, appointment\_time, status)}
+  \item \textbf{Billing(bill\_id, patient\_id, appointment\_id, services, total\_amount, status, payment\_date, payment\_method)}
+  \item \textbf{Departments(department\_id, name)}, \textbf{LabTests(lab\_test\_id, test\_catalog\_id, status, ...)}
+  \item \textbf{Pharmacy(pharmacy\_id, medicine\_details, price)}, \textbf{HomeVisit(visit\_id, service\_type, assigned\_id, visit\_date/time, status)}
+  \item \textbf{EMR(...)} for clinical notes; \textbf{AuditLogs(...)} for admin audit views.
+\end{itemize}
+
+\section{Non-Functional Considerations}
+\begin{itemize}
+  \item \textbf{Performance}: DB filtering by indexed columns (dates, status, foreign keys); pagination on heavy lists.
+  \item \textbf{Security}: JWT auth, role checks, parameter validation, hidden internal IDs in UI.
+  \item \textbf{Reliability}: Email delivery errors are non-blocking; background jobs for reminders.
+  \item \textbf{Scalability}: Analytics endpoints designed to return chart-ready minimal payloads.
+\end{itemize}
+
+\section{Conclusion}
+This chapter consolidates the HMS features as implemented across UI, API, and database layers. It is intended as a single reference for reviewers to understand module purpose, flows, technologies, and data touchpoints without duplicating the detailed content present in other chapters.

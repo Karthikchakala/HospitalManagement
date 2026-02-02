@@ -1,0 +1,28 @@
+\chapter{Introduction} 
+\label{Chapter1} 
+\lhead{Chapter 1. \emph{Introduction}} 
+
+\section{Background and Motivation}
+
+Modern hospitals operate a complex ecosystem of services across outpatient care, inpatient admissions, diagnostics, pharmacy, billing, and telemedicine. Many institutions still rely on siloed tools or manual workflows that lead to appointment clashes, delayed communication, and scattered patient records. This project addresses those gaps by designing and implementing a comprehensive Hospital Management System (HMS) that unifies administrative, clinical, and financial workflows in a single platform.
+
+The system offers secure authentication, a patient portal with appointment booking and history, a doctor workspace, real-time chat, and virtual consultations via WebRTC. Operational modules include laboratory and pharmacy workflows, EMR integration, billing and payments (Razorpay), home visits, and a robust admin analytics dashboard for decision-making. The goal is to provide a cohesive, privacy-conscious, and scalable solution that reduces administrative friction and improves patient outcomes.
+
+Technically, the HMS uses a modern full‑stack architecture: Next.js (React + TypeScript) and Tailwind CSS on the frontend for responsive, accessible UI; Node.js/Express on the backend; and Supabase (Postgres) for secure, relational data. JWT underpins authentication and authorization; Nodemailer powers email notifications; Razorpay enables online payments; and WebRTC supports low-latency video for virtual appointments. Admin analytics are visualized using Recharts.
+
+The expected outcomes include improved appointment utilization, faster triage, transparent billing, and actionable insights for administrators. The platform emphasizes auditability, role-based access control, and maintainability to support real-world deployment in clinics and mid-sized hospitals.
+
+\subsection{Scope and Objectives}
+Scope and objectives: The HMS covers core hospital workflows—registration, scheduling, EMR, diagnostics, pharmacy, billing, and analytics—while enabling remote care through chat and video. Key objectives are to streamline patient onboarding, reduce waiting times, centralize clinical data, automate notifications, and provide leadership with real-time insights.
+
+The system is designed with security and compliance in mind: encrypted transport (HTTPS), hashed credentials, least-privilege access, and auditable actions. The modular architecture supports incremental rollout—departments can adopt features progressively without disrupting hospital operations.
+
+\subsection{Contributions}
+Contributions: We implement unified appointment management (in-person and virtual), department/doctor-wise analytics, and integrated billing. Reusable frontend components (DateFilter, ChartCard, StatCard) provide a consistent UX. Backend services expose RESTful APIs for patients, staff, doctors, and admins, backed by optimized Supabase queries.
+
+\section{Report Organization}
+Document organization: The report introduces the problem and goals, surveys related systems, presents the architecture and database design, details the implementation of each module, demonstrates analytics visualizations, and evaluates the system with tests and metrics. It concludes with limitations and future work, including advanced EMR features and predictive analytics.
+
+Summary: The HMS delivers a secure, extensible platform that modernizes hospital workflows, improves coordination among stakeholders, and enhances patient experience through digital-first services.
+
+This chapter frames the motivation, scope, and structure of the project report to guide the reader through the HMS design and implementation.

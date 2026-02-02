@@ -1,0 +1,36 @@
+% Chapter Template
+
+\chapter{Testing and Evaluation} % Main chapter title
+
+\label{Chapter6} % Change X to a consecutive number; for referencing this chapter elsewhere, use \ref{Chapter6}
+
+\lhead{Chapter 6. \emph{Testing and Evaluation}} % Change X to a consecutive number; this is for the header on each page - perhaps a shortened title
+
+%----------------------------------------------------------------------------------------
+%	SECTION 1
+%----------------------------------------------------------------------------------------
+
+\section{Testing Strategy and Coverage}
+
+Testing and evaluation: We validated the HMS through unit tests, integration tests, and scenario-driven end-to-end checks. Backend routes were exercised with authenticated requests covering appointment creation, cancellation, rescheduling, billing generation, and analytics queries. Frontend workflows were tested for accessibility, error states, and responsive behavior across breakpoints.
+
+%-----------------------------------
+%	SUBSECTION 1
+%-----------------------------------
+\subsection{Backend API Testing}
+Backend testing: API integration tests verified JWT protection, role-based access (patient, doctor, staff, admin), and validation for required fields. Appointment flows were tested for consistency across in-person and virtual visits; billing hooks were asserted for correct creation and totals. Analytics endpoints were validated for date filtering, grouping, and inclusion of virtual consultations and inpatient services.
+
+%-----------------------------------
+%	SUBSECTION 2
+%-----------------------------------
+
+\subsection{Frontend and Performance}
+Frontend and performance: UI paths for booking, viewing, canceling, and rescheduling were exercised with mocked network conditions. Recharts visualizations were checked for correctness under different date ranges and empty states. Basic performance checks ensured acceptable response times for core routes under typical loads; logs and error boundaries were verified to provide actionable diagnostics without leaking sensitive data.
+
+%----------------------------------------------------------------------------------------
+%	SECTION 2
+%----------------------------------------------------------------------------------------
+
+\section{Results and Discussion}
+
+Results and discussion: Tests confirmed that authentication, role checks, and core patient/admin workflows behave as expected. Analytics charts render consistently across date windows, and appointment management provides clear user feedback. Limitations include the absence of automated load testing and partial coverage of edge cases (e.g., concurrent edits), which are reserved for future work alongside CI/CD hardening and observability.
