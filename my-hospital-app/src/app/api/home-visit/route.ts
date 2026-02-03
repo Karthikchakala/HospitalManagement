@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
 
     // Trigger backend mailer to send confirmation
     try {
-      const base = process.env.BACKEND_BASE_URL || 'http://localhost:5000';
+      const base = process.env.NEXT_PUBLIC_API_URL;
       await fetch(`${base}/api/notifications/home-visit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

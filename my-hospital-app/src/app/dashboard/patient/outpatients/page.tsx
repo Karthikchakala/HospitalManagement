@@ -61,7 +61,7 @@ export default function OutpatientsPage() {
       if (filters.doctor_id) params.set("doctor_id", filters.doctor_id);
       if (filters.department_id) params.set("department_id", filters.department_id);
       if (filters.payment_status) params.set("payment_status", filters.payment_status);
-      const { data } = await axios.get<OutpatientRow[]>(`http://localhost:5000/api/patient/outpatients?${params.toString()}`);
+      const { data } = await axios.get<OutpatientRow[]>(`${process.env.NEXT_PUBLIC_API_URL}/api/patient/outpatients?${params.toString()}`);
       setList(data);
     } catch (e) {
       console.error(e);
@@ -88,7 +88,7 @@ export default function OutpatientsPage() {
         consultation_fee: form.consultation_fee ? Number(form.consultation_fee) : null,
         payment_status: form.payment_status || "Pending",
       };
-      await axios.post("http://localhost:5000/api/patient/outpatients/book", payload);
+      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/patient/outpatients/book`, payload);
       setForm({ patient_id: "", doctor_id: "", department_id: "", visit_date: "", appointment_time: "", symptoms: "", consultation_fee: "", payment_status: "Pending" });
       await fetchList();
       alert("Appointment Booked Successfully");

@@ -32,12 +32,12 @@ export default function SampleTrackingPage() {
             if (!token) { router.push('/login'); return; }
 
             try {
-                const userResponse = await axios.get('http://localhost:5000/api/staff/profile', {
+                const userResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/staff/profile`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setUserName(userResponse.data.name);
 
-                const samplesResponse = await axios.get('http://localhost:5000/api/staff/lab/samples', {
+                const samplesResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/staff/lab/samples`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setPendingSamples(samplesResponse.data);

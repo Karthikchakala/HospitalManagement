@@ -30,7 +30,7 @@ export default function DoctorsDirectoryPage() {
           const parsed = JSON.parse(cache);
           if (mounted) setDocs(parsed);
         } else {
-          const BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:5000';
+          const BASE = process.env.NEXT_PUBLIC_API_BASE || process.env.NEXT_PUBLIC_API_URL;
           const { data } = await axios.get(`${BASE}/api/doctors`);
           const items = data?.data || [];
           if (mounted) {

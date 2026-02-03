@@ -47,7 +47,7 @@ export default function DoctorPatientRecordPage() {
             if (!token || !patientId) { router.push('/login'); return; }
 
             try {
-                const response = await axios.get(`http://localhost:5000/api/doctor/patient-emrs/${patientId}`, {
+                const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/doctor/patient-emrs/${patientId}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 

@@ -60,7 +60,7 @@ export default function InpatientsPage() {
       if (filters.doctor_id) params.set("doctor_id", filters.doctor_id);
       if (filters.department_id) params.set("department_id", filters.department_id);
       if (filters.status) params.set("status", filters.status);
-      const { data } = await axios.get<InpatientRow[]>(`http://localhost:5000/api/patient/inpatients?${params.toString()}`);
+      const { data } = await axios.get<InpatientRow[]>(`${process.env.NEXT_PUBLIC_API_URL}/api/patient/inpatients?${params.toString()}`);
       setList(data);
     } catch (e) {
       console.error(e);
@@ -86,7 +86,7 @@ export default function InpatientsPage() {
         diagnosis: form.diagnosis || null,
         treatment_plan: form.treatment_plan || null,
       };
-      await axios.post("http://localhost:5000/api/patient/inpatients/admit", payload);
+      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/patient/inpatients/admit`, payload);
       setForm({ patient_id: "", doctor_id: "", department_id: "", room_number: "", ward_type: "General", diagnosis: "", treatment_plan: "" });
       await fetchList();
       alert("Patient Admitted Successfully");
@@ -100,7 +100,7 @@ export default function InpatientsPage() {
 
   const discharge = async (id: number) => {
     try {
-      await axios.put(`http://localhost:5000/api/patient/inpatients/discharge/${id}`);
+      await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/patient/inpatients/discharge/${id}`);
       await fetchList();
       alert("Patient Discharged");
     } catch (e: unknown) {

@@ -27,7 +27,7 @@ router.post('/virtual-appointments', protect, async (req: AuthRequest, res: Resp
     const patientId = await getPatientId(userId);
     if (!patientId) return res.status(404).json({ message: 'Patient not found' });
 
-    const SITE = process.env.NEXT_PUBLIC_SITE_URL || process.env.FRONTEND_BASE || 'http://localhost:3000';
+    const SITE = process.env.FRONTEND_BASE;
     const roomId = randomUUID();
     const webrtcLink = `${SITE}/video/${encodeURIComponent(roomId)}`;
 

@@ -37,7 +37,7 @@ export default function DoctorDashboard() {
       }
 
       try {
-        const response = await axios.get('http://localhost:5000/api/doctor/profile', {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/doctor/profile`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

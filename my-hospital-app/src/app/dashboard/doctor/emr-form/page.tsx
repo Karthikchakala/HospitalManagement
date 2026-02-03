@@ -61,9 +61,9 @@ export default function NewEMRPage() {
 
       try {
         const [patientsResponse, profileResponse, catalogResponse] = await Promise.all([
-          axios.get('http://localhost:5000/api/doctor/patients', { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get('http://localhost:5000/api/doctor/profile', { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get('http://localhost:5000/api/doctor/lab-catalog', { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/doctor/patients`, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/doctor/profile`, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/doctor/lab-catalog`, { headers: { Authorization: `Bearer ${token}` } }),
         ]);
 
         setPatients(patientsResponse.data);
@@ -198,7 +198,7 @@ export default function NewEMRPage() {
 
   //   try {
   //     const token = localStorage.getItem('token');
-  //     const response = await axios.post('http://localhost:5000/api/doctor/upload/document', formData, {
+  //     const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/doctor/upload/document`, formData, {
   //       headers: { Authorization: `Bearer ${token}` },
   //     });
   //     setUploadedFile(response.data);
@@ -220,7 +220,7 @@ export default function NewEMRPage() {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.post(
-        'http://localhost:5000/api/doctor/upload/document',
+        `${process.env.NEXT_PUBLIC_API_URL}/api/doctor/upload/document`,
         formData,
         {
           headers: {
@@ -257,7 +257,7 @@ export default function NewEMRPage() {
     try {
       const token = localStorage.getItem('token');
       await axios.post(
-        'http://localhost:5000/api/doctor/emr',
+        `${process.env.NEXT_PUBLIC_API_URL}/api/doctor/emr`,
         {
           patientId: selectedPatientId,
           doctorId,

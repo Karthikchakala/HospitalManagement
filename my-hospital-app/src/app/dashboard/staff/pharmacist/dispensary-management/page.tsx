@@ -51,17 +51,17 @@ export default function DispensaryManagementPage() {
             if (!token) { router.push('/login'); return; }
 
             try {
-                const userResponse = await axios.get('http://localhost:5000/api/staff/profile', {
+                const userResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/staff/profile`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setUserName(userResponse.data.name);
 
-                const apptResponse = await axios.get('http://localhost:5000/api/staff/pharmacy/pending', {
+                const apptResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/staff/pharmacy/pending`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setPendingAppointments(apptResponse.data);
 
-                const medResponse = await axios.get('http://localhost:5000/api/staff/pharmacy/medicines', {
+                const medResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/staff/pharmacy/medicines`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setMedicineCatalog(medResponse.data);
@@ -115,7 +115,7 @@ export default function DispensaryManagementPage() {
         if (!token) return;
 
         try {
-            await axios.put(`http://localhost:5000/api/staff/pharmacy/dispense/${selectedAppt.appointment_id}`, {
+            await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/staff/pharmacy/dispense/${selectedAppt.appointment_id}`, {
                 patientId: selectedAppt.patient_id,
                 medicineCost: totalMedicineCost,
                 totalBillAmount: totalMedicineCost,

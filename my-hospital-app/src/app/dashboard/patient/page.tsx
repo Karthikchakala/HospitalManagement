@@ -27,7 +27,7 @@ export default function PatientDashboard() {
         return;
       }
       try {
-        const { data } = await axios.get('http://localhost:5000/api/patient/profile', {
+        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/patient/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setProfileData(data);

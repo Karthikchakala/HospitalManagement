@@ -36,12 +36,12 @@ export default function PatientBillsPage() {
         if (!token) { router.push('/login'); return; }
 
         try {
-            const userResponse = await axios.get('http://localhost:5000/api/patient/profile', {
+            const userResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/patient/profile`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setUserName(userResponse.data.name);
 
-            const billsResponse = await axios.get('http://localhost:5000/api/patient/bills', {
+            const billsResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/patient/bills`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setBills(billsResponse.data);
@@ -69,14 +69,14 @@ export default function PatientBillsPage() {
         }
 
         try {
-            const paymentInitResponse = await axios.post('http://localhost:5000/api/patient/payment/initiate', {
+            const paymentInitResponse = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/patient/payment/initiate`, {
                 billId: bill.bill_id,
                 amount: bill.total_amount
             }, { headers: { Authorization: `Bearer ${token}` } });
 
             const { transactionId } = paymentInitResponse.data;
 
-            await axios.put(`http://localhost:5000/api/patient/bills/${bill.bill_id}/pay`, {
+            await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/patient/bills/${bill.bill_id}/pay`, {
                 transactionId,
                 paymentMethod: 'Credit Card (Mock)'
             }, { headers: { Authorization: `Bearer ${token}` } });

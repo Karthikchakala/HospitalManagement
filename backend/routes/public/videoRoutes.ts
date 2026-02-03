@@ -95,7 +95,7 @@ router.post('/video/invite', protect, express.json(), async (req, res) => {
       return res.status(400).json({ success: false, message: 'Missing recipient email(s)' });
     }
 
-    const SITE = process.env.NEXT_PUBLIC_SITE_URL || process.env.FRONTEND_BASE || 'http://localhost:3000';
+    const SITE = process.env.FRONTEND_BASE;
     const meetUrl = `${SITE}/video/${encodeURIComponent(String(roomId))}`;
 
     const transporter = nodemailer.createTransport({

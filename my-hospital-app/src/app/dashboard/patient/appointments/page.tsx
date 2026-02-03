@@ -112,7 +112,7 @@ function AppointmentsContent() {
 
         try {
           const response = await axios.get(
-            `http://localhost:5000/api/patient/appointments/doctors/${selectedDepartment}`,
+            `${process.env.NEXT_PUBLIC_API_URL}/api/patient/appointments/doctors/${selectedDepartment}`,
             { headers: { Authorization: `Bearer ${token}` } }
           );
           setDoctors(
@@ -139,7 +139,7 @@ function AppointmentsContent() {
         if (!token) return;
         try {
           const response = await axios.get(
-            `http://localhost:5000/api/patient/appointments/times/${selectedDoctor}/${selectedDate}`,
+            `${process.env.NEXT_PUBLIC_API_URL}/api/patient/appointments/times/${selectedDoctor}/${selectedDate}`,
             { headers: { Authorization: `Bearer ${token}` } }
           );
           setTimeSlots(response.data.timeSlots);
@@ -170,7 +170,7 @@ function AppointmentsContent() {
     if (!token) return;
     try {
       await axios.patch(
-        `http://localhost:5000/api/patient/appointments/${it.type}/${it.appointment_id}/cancel`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/patient/appointments/${it.type}/${it.appointment_id}/cancel`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -182,7 +182,7 @@ function AppointmentsContent() {
     const token = localStorage.getItem('token');
     if (!token || !doctorId || !date) return;
     try {
-      const resp = await axios.get(`http://localhost:5000/api/patient/appointments/times/${doctorId}/${date}`, { headers: { Authorization: `Bearer ${token}` } });
+      const resp = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/patient/appointments/times/${doctorId}/${date}`, { headers: { Authorization: `Bearer ${token}` } });
       setSlotOptions(resp.data?.timeSlots || []);
     } catch { }
   };
@@ -207,7 +207,7 @@ function AppointmentsContent() {
     if (!token) return;
     try {
       await axios.patch(
-        `http://localhost:5000/api/patient/appointments/${resItem.type}/${resItem.appointment_id}/reschedule`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/patient/appointments/${resItem.type}/${resItem.appointment_id}/reschedule`,
         { appointment_date: newDate, appointment_time: newTime },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -224,7 +224,7 @@ function AppointmentsContent() {
     if (!token) return;
     try {
       setLoadingUpcoming(true);
-      const resp = await axios.get('http://localhost:5000/api/patient/appointments/upcoming', { headers: { Authorization: `Bearer ${token}` } });
+      const resp = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/patient/appointments/upcoming`, { headers: { Authorization: `Bearer ${token}` } });
       setUpcoming(resp.data?.data || []);
     } catch { }
     finally { setLoadingUpcoming(false); }
@@ -242,7 +242,7 @@ function AppointmentsContent() {
 
     try {
       await axios.post(
-        'http://localhost:5000/api/patient/appointments',
+        `${process.env.NEXT_PUBLIC_API_URL}/api/patient/appointments`,
         {
           doctorId: selectedDoctor,
           appointmentDate: selectedDate,
@@ -259,7 +259,7 @@ function AppointmentsContent() {
       );
       try {
         await axios.post(
-          'http://localhost:5000/api/video/invite',
+          `${process.env.NEXT_PUBLIC_API_URL}/api/video/invite`,
           { doctorId: selectedDoctor, roomId: `appt-${orderId}`, paymentMode: 'Razorpay' },
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -284,7 +284,7 @@ function AppointmentsContent() {
 
     try {
       const txnResponse = await axios.post(
-        'http://localhost:5000/api/patient/payment/generate-txn',
+        `${process.env.NEXT_PUBLIC_API_URL}/api/patient/payment/generate-txn`,
         { amount: price },
         { headers: { Authorization: `Bearer ${token}` } }
       );

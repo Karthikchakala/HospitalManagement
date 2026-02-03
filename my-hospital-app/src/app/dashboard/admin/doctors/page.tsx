@@ -44,7 +44,7 @@ export default function AdminDoctorManagementPage() {
         if (!token) { router.push('/login'); return; }
 
         try {
-            const response = await axios.get('http://localhost:5000/api/admin/doctors', {
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/doctors`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setDoctors(response.data);
@@ -83,7 +83,7 @@ export default function AdminDoctorManagementPage() {
         }
 
         try {
-            const response = await axios.put(`http://localhost:5000/api/admin/doctors/${editingId}`, {
+            const response = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/doctors/${editingId}`, {
                 name: editForm.name,
                 email: editForm.email,
                 specialization: editForm.specialization,

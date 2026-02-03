@@ -34,7 +34,7 @@ export default function AdminSupportTicketsPage() {
             if (!token) { router.push('/login'); return; }
 
             try {
-                const response = await axios.get('http://localhost:5000/api/admin/tickets', {
+                const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/tickets`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setTickets(response.data);

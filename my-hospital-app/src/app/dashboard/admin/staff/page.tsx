@@ -45,7 +45,7 @@ export default function AdminStaffManagementPage() {
         }
 
         try {
-            const response = await axios.get('http://localhost:5000/api/admin/staff', {
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/staff`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setStaff(response.data);
@@ -83,7 +83,7 @@ export default function AdminStaffManagementPage() {
         }
 
         try {
-            const response = await axios.put(`http://localhost:5000/api/admin/staff/${editingId}`, {
+            const response = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/staff/${editingId}`, {
                 name: editForm.name,
                 email: editForm.email,
                 designation: editForm.designation,

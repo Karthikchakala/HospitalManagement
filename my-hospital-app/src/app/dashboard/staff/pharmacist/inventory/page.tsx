@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import DashboardNavbar from "../../../../../components/DashboardNavbar";
-const BASE = process.env.NEXT_PUBLIC_BACKEND_BASE_URL || 'http://localhost:5000';
+const BASE = process.env.NEXT_PUBLIC_BACKEND_BASE_URL || process.env.NEXT_PUBLIC_API_URL;
 
 type Item = {
   pharmacy_id: number;

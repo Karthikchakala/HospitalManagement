@@ -38,7 +38,7 @@ export default function AdminDepartmentsPage() {
         }
 
         try {
-            const response = await axios.get('http://localhost:5000/api/admin/departments', {
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/departments`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setDepartments(response.data);
@@ -76,7 +76,7 @@ export default function AdminDepartmentsPage() {
         if (!token) return;
 
         try {
-            await axios.delete(`http://localhost:5000/api/admin/departments/${id}`, {
+            await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/departments/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             alert('✅ Department deleted successfully!');
@@ -93,8 +93,8 @@ export default function AdminDepartmentsPage() {
         if (!formState.name || !token) return;
 
         const url = isEditing
-            ? `http://localhost:5000/api/admin/departments/${formState.id}`
-            : 'http://localhost:5000/api/admin/departments';
+            ? `${process.env.NEXT_PUBLIC_API_URL}/api/admin/departments/${formState.id}`
+            : `${process.env.NEXT_PUBLIC_API_URL}/api/admin/departments`;
         const method = isEditing ? axios.put : axios.post;
 
         try {
