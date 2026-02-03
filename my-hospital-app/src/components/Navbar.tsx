@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react'; // <-- needed for mobileOpen
+import { useState } from 'react'; 
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 
 export default function Navbar() {
-  const [mobileOpen, setMobileOpen] = useState(false); // <-- declare state
+  const [mobileOpen, setMobileOpen] = useState(false); 
 
   return (
     <motion.nav
