@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useChat, JoinPayload, AppointmentType, ChatMessage } from '../lib/useChat';
 
-const defaultServer = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL;
+const defaultServer = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || '';
 
 type PatientItem = { patient_id: number; name: string };
 
