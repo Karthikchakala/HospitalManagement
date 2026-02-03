@@ -40,12 +40,12 @@ export default function ResultsManagementPage() {
             if (!token) { router.push('/login'); return; }
 
             try {
-                const userResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/staff/profile`, {
+                const userResponse = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/staff/profile`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setUserName(userResponse.data.name);
 
-                const testResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/staff/lab/pending`, {
+                const testResponse = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/staff/lab/pending`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setPendingTests(testResponse.data);
@@ -79,7 +79,7 @@ export default function ResultsManagementPage() {
         if (!token) return;
 
         try {
-            await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/staff/lab/result/${resultForm.testId}`, {
+            await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/staff/lab/result/${resultForm.testId}`, {
                 resultValue: resultForm.resultValue,
                 unit: resultForm.unit,
             }, {

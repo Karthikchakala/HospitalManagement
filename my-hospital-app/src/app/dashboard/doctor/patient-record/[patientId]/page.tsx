@@ -28,7 +28,7 @@ export default function DoctorPatientRecordPage() {
     const router = useRouter();
     const params = useParams();
     const patientId = params.patientId as string;
-    
+
     const [records, setRecords] = useState<EMR[]>([]);
     const [patientName, setPatientName] = useState('Loading Patient...');
     const [isLoading, setIsLoading] = useState(true);
@@ -47,12 +47,12 @@ export default function DoctorPatientRecordPage() {
             if (!token || !patientId) { router.push('/login'); return; }
 
             try {
-                const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/doctor/patient-emrs/${patientId}`, {
+                const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/doctor/patient-emrs/${patientId}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-                
+
                 setRecords(response.data);
-                
+
                 if (response.data.length > 0) {
                     setPatientName(response.data[0].patient_name);
                 }
@@ -69,7 +69,7 @@ export default function DoctorPatientRecordPage() {
     }, [router, patientId]);
 
     const getFileIcon = (type: string) => {
-        if (type.includes('LabResult')) 
+        if (type.includes('LabResult'))
             return <DocumentTextIcon className="w-5 h-5 mr-1 text-teal-300" />;
         return <DocumentTextIcon className="w-5 h-5 mr-1 text-purple-300" />;
     };
@@ -91,18 +91,18 @@ export default function DoctorPatientRecordPage() {
             <ParticlesBackground />
 
             <div className="relative z-10">
-                <DashboardNavbar 
-                    title="Doctor Portal" 
-                    navLinks={doctorNavLinks} 
-                    userName={doctorName} 
+                <DashboardNavbar
+                    title="Doctor Portal"
+                    navLinks={doctorNavLinks}
+                    userName={doctorName}
                 />
-                
+
                 <main className="container mx-auto py-12 px-6">
                     <h1 className="text-5xl font-extrabold text-cyan-200 mb-2 drop-shadow-lg">
                         Medical History for {patientName}
                     </h1>
                     <p className="mb-10 text-lg text-cyan-300">Patient ID: {patientId}</p>
-                    
+
                     {records.length === 0 ? (
                         <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-md border border-cyan-700/30 p-8 rounded-2xl shadow-lg">
                             <p className="text-xl text-slate-300 text-center">
@@ -143,8 +143,8 @@ export default function DoctorPatientRecordPage() {
                                 const colors = colorSchemes[index % colorSchemes.length];
 
                                 return (
-                                    <div 
-                                        key={record.record_id} 
+                                    <div
+                                        key={record.record_id}
                                         className={`backdrop-blur-md p-6 rounded-2xl border-l-4 transition-all duration-300 hover:scale-[1.01] bg-gradient-to-br ${colors.gradient} ${colors.border} shadow-xl ${colors.shadow}`}
                                     >
                                         <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-4 pb-3 border-b border-slate-700/50">
@@ -159,7 +159,7 @@ export default function DoctorPatientRecordPage() {
                                                 })}
                                             </span>
                                         </div>
-                                        
+
                                         <div className="space-y-3">
                                             <p className="text-slate-200">
                                                 <span className={`font-semibold ${colors.accent}`}>Prescriptions:</span>{' '}
@@ -179,7 +179,7 @@ export default function DoctorPatientRecordPage() {
                                                 </p>
                                                 <div className="flex flex-wrap gap-3">
                                                     {record.file_links.map((file, idx) => (
-                                                        <a 
+                                                        <a
                                                             key={idx}
                                                             href={file.url}
                                                             target="_blank"

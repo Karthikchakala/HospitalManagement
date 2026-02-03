@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useChat, JoinPayload, ChatMessage } from '../lib/useChat';
 
-const defaultServer = process.env.NEXT_PUBLIC_API_URL || '';
+const defaultServer = process.env.NEXT_PUBLIC_BACKEND_BASE_URL || '';
 
 function ChatRoom({ serverUrl, join }: { serverUrl: string; join: JoinPayload }) {
   const { messages, sendMessage, typing, stopTyping, typingFrom } = useChat(serverUrl, join);

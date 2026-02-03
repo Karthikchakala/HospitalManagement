@@ -43,7 +43,7 @@ export default function DoctorAppointmentsPage() {
 
             try {
                 // Fetch profile data
-                const userResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/doctor/profile`, {
+                const userResponse = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/doctor/profile`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
 
@@ -58,7 +58,7 @@ export default function DoctorAppointmentsPage() {
                 setUserName(name);
                 setLoggedInDoctorId(doctorId);
 
-                const apptsResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/doctor/appointments`, {
+                const apptsResponse = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/doctor/appointments`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 // Assuming apptsResponse.data is the array provided in the prompt
@@ -83,7 +83,7 @@ export default function DoctorAppointmentsPage() {
 
         try {
             await axios.put(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/doctor/appointments/${appointmentId}/complete`,
+                `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/doctor/appointments/${appointmentId}/complete`,
                 {},
                 { headers: { Authorization: `Bearer ${token}` } }
             );

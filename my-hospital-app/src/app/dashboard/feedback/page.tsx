@@ -19,7 +19,7 @@ export default function FeedbackHelpdeskPage() {
         setIsSubmitting(true);
         const token = localStorage.getItem('token');
         try {
-            await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/utils/feedback`, feedbackData, { headers: { Authorization: `Bearer ${token}` } });
+            await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/utils/feedback`, feedbackData, { headers: { Authorization: `Bearer ${token}` } });
             alert('Thank you! Your feedback has been recorded.');
             setFeedbackData({ subject: '', comments: '' });
         } catch {
@@ -35,7 +35,7 @@ export default function FeedbackHelpdeskPage() {
         setIsSubmitting(true);
         const token = localStorage.getItem('token');
         try {
-            await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/utils/support`, supportData, { headers: { Authorization: `Bearer ${token}` } });
+            await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/utils/support`, supportData, { headers: { Authorization: `Bearer ${token}` } });
             alert('Support ticket created successfully. An admin will review it shortly.');
             setSupportData({ type: 'Bug Report', description: '' });
         } catch {

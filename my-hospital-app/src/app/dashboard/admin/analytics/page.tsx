@@ -19,7 +19,7 @@ const adminNavLinks = [
   { name: 'Settings', href: '/dashboard/admin/settings' },
 ]
 
-const API_BASE = process.env.NEXT_PUBLIC_BACKEND_BASE_URL || process.env.NEXT_PUBLIC_API_URL
+const API_BASE = process.env.NEXT_PUBLIC_BACKEND_BASE_URL || process.env.NEXT_PUBLIC_BACKEND_BASE_URL
 
 type Tab = 'revenue' | 'department' | 'doctor' | 'staff'
 

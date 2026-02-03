@@ -26,7 +26,7 @@ export default function PatientSignupPage() {
     setSubmitting(true);
 
     try {
-      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`, {
+      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/auth/register`, {
         ...formData,
         role: 'patient',
       });

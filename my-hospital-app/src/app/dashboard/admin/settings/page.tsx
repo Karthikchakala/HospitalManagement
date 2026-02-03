@@ -43,8 +43,8 @@ export default function AdminSettingsPage() {
 
       try {
         const [profileResponse, settingsResponse] = await Promise.all([
-          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/profile`, { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/settings`, { headers: { Authorization: `Bearer ${token}` } })
+          axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/admin/profile`, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/admin/settings`, { headers: { Authorization: `Bearer ${token}` } })
         ]);
 
         setAdminName(profileResponse.data.name);
@@ -93,7 +93,7 @@ export default function AdminSettingsPage() {
     if (!token || !settings) return;
 
     try {
-      await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/settings`, {
+      await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/admin/settings`, {
         consultationFee: settings.consultationFee,
         hospitalName: settings.hospitalName,
         defaultCurrency: settings.defaultCurrency,

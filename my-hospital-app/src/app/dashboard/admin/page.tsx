@@ -34,7 +34,7 @@
 //                 return;
 //             }
 //             try {
-//                 const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/profile`, {
+//                 const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/admin/profile`, {
 //                     headers: { Authorization: `Bearer ${token}` }
 //                 });
 //                 setAdminName(response.data.name);
@@ -257,7 +257,7 @@ export default function AdminDashboard() {
         return;
       }
       try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/profile`, {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/admin/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setAdminName(response.data.name);
@@ -277,7 +277,7 @@ export default function AdminDashboard() {
       if (!token) return;
 
       try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/stats`, {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/admin/stats`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setStats(response.data);

@@ -36,7 +36,7 @@ export default function ReceptionistDashboard() {
         return;
       }
       try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/staff/profile`, {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/staff/profile`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setProfileData(response.data);

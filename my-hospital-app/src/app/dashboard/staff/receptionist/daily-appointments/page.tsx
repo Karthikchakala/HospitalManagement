@@ -55,14 +55,14 @@ export default function ReceptionistDailyAppointmentsPage() {
         setErrorMsg(null);
         try {
             // Fetch user name
-            const userResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/staff/profile`, {
+            const userResponse = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/staff/profile`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setUserName(userResponse.data.name);
 
             // Fetch appointments with filters/pagination
             const params: Record<string, unknown> = { date, status: statusFilter, page, pageSize };
-            const resp = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/staff/appointments/today`, {
+            const resp = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/staff/appointments/today`, {
                 headers: { Authorization: `Bearer ${token}` },
                 params,
             });
@@ -129,7 +129,7 @@ export default function ReceptionistDailyAppointmentsPage() {
         // optimistic update
         setAppointments((curr) => curr.map(a => a.id === id ? { ...a, status: nextStatus } : a));
         try {
-            await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/api/staff/appointments/${id}/status`, { status: nextStatus }, {
+            await axios.patch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/staff/appointments/${id}/status`, { status: nextStatus }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setSuccessMsg('Status updated');
@@ -148,7 +148,7 @@ export default function ReceptionistDailyAppointmentsPage() {
         if (!token) { router.push('/login'); return; }
         try {
             const params: Record<string, unknown> = { date, status: statusFilter, page, pageSize, format: 'csv' };
-            const resp = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/staff/appointments/today`, {
+            const resp = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/staff/appointments/today`, {
                 headers: { Authorization: `Bearer ${token}` },
                 params,
                 responseType: 'blob',

@@ -34,7 +34,7 @@ export default function DoctorSignupPage() {
 
     setSubmitting(true);
     try {
-      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`, {
+      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/auth/register`, {
         name: formData.name,
         email: formData.email,
         password: formData.password,

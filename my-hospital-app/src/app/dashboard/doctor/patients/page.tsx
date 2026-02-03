@@ -36,12 +36,12 @@ export default function DoctorPatientsPage() {
             }
 
             try {
-                const userResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/doctor/profile`, {
+                const userResponse = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/doctor/profile`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setUserName(userResponse.data.name);
 
-                const patientsResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/doctor/patients`, {
+                const patientsResponse = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/doctor/patients`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setPatients(patientsResponse.data);

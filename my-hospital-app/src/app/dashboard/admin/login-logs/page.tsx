@@ -61,7 +61,7 @@ export default function AdminLoginLogsPage() {
             if (endDate) params.endDate = endDate;
             if (actionFilter && actionFilter !== 'All') params.action = actionFilter;
 
-            const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/logs`, {
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/admin/logs`, {
                 headers: { Authorization: `Bearer ${token}` },
                 params,
             });
@@ -99,7 +99,7 @@ export default function AdminLoginLogsPage() {
             if (endDate) params.endDate = endDate;
             if (actionFilter && actionFilter !== 'All') params.action = actionFilter;
 
-            const resp = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/logs`, {
+            const resp = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/admin/logs`, {
                 headers: { Authorization: `Bearer ${token}` },
                 params,
                 responseType: 'blob',

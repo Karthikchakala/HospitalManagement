@@ -45,12 +45,12 @@ export default function ReceptionistPatientRegistrationPage() {
 
         const fetchData = async () => {
             try {
-                const userResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/staff/profile`, {
+                const userResponse = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/staff/profile`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setStaffName(userResponse.data.name);
 
-                const deptResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/patient/appointments/departments`, {
+                const deptResponse = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/patient/appointments/departments`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setDepartments(deptResponse.data);
@@ -66,7 +66,7 @@ export default function ReceptionistPatientRegistrationPage() {
             const fetchDoctors = async () => {
                 const token = localStorage.getItem('token');
                 try {
-                    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/patient/appointments/doctors/${formData.selectedDepartment}`, {
+                    const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/patient/appointments/doctors/${formData.selectedDepartment}`, {
                         headers: { Authorization: `Bearer ${token}` }
                     });
                     setDoctors(response.data.map((doc: { doctor_id: number; User: { name: string }; specialization: string }) => ({
@@ -89,7 +89,7 @@ export default function ReceptionistPatientRegistrationPage() {
             const fetchTimeSlots = async () => {
                 const token = localStorage.getItem('token');
                 try {
-                    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/patient/appointments/times/${formData.selectedDoctor}/${formData.selectedDate}`, {
+                    const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/patient/appointments/times/${formData.selectedDoctor}/${formData.selectedDate}`, {
                         headers: { Authorization: `Bearer ${token}` }
                     });
                     setTimeSlots(response.data.timeSlots);
@@ -140,7 +140,7 @@ export default function ReceptionistPatientRegistrationPage() {
                 reason: formData.reason || 'Initial consultation.',
             };
 
-            const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/staff/register-patient`, payload, {
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/staff/register-patient`, payload, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 

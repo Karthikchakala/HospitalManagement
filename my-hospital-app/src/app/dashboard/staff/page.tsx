@@ -19,7 +19,7 @@ export default function StaffRouter() {
 
       try {
         // Fetch staff profile data from the backend to get the 'designation'
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/staff/profile`, {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/staff/profile`, {
           headers: { Authorization: `Bearer ${token}` }
         });
 

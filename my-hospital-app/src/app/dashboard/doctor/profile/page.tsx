@@ -38,7 +38,7 @@ export default function DoctorProfilePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
 
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+  const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
   const doctorNavLinks = [
     { name: 'Home', href: '/' },
     { name: 'Dashboard', href: '/dashboard/doctor' },

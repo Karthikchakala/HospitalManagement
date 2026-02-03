@@ -25,7 +25,7 @@ export default function LoginPage() {
     setError('');
     setSubmitting(true);
     try {
-      const response = await axios.post<LoginResponse>(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, { email, password });
+      const response = await axios.post<LoginResponse>(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/auth/login`, { email, password });
       const { token, role } = response.data;
       localStorage.setItem('token', token);
 

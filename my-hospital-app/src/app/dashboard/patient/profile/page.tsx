@@ -63,7 +63,7 @@ export default function PatientProfilePage() {
       }
 
       try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/patient/profile`, {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/patient/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setProfileData(response.data);
@@ -96,7 +96,7 @@ export default function PatientProfilePage() {
     if (!token) return;
 
     try {
-      await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/patient/profile`, formData, {
+      await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/patient/profile`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       alert('Profile updated successfully!');

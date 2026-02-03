@@ -58,13 +58,13 @@ export default function PatientMedicalHistoryPage() {
 
       try {
         const [userResponse, emrResponse, labResponse] = await Promise.all([
-          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/patient/profile`, {
+          axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/patient/profile`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/patient/history`, {
+          axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/patient/history`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/patient/lab-results`, {
+          axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/patient/lab-results`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);

@@ -69,12 +69,12 @@ export default function PatientBillsPage() {
         if (!token) { router.push('/login'); return; }
 
         try {
-            const userResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/patient/profile`, {
+            const userResponse = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/patient/profile`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setUserName(userResponse.data.name);
 
-            const billsResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/patient/bills`, {
+            const billsResponse = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/patient/bills`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setBills(billsResponse.data);
@@ -116,7 +116,7 @@ export default function PatientBillsPage() {
         try {
             const amountInPaise = Math.round(bill.total_amount * 100);
 
-            const txnResponse = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/patient/payment/generate-txn`, {
+            const txnResponse = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/patient/payment/generate-txn`, {
                 billId: bill.bill_id,
                 amount: amountInPaise,
             }, { headers: { Authorization: `Bearer ${token}` } });
@@ -131,7 +131,7 @@ export default function PatientBillsPage() {
                 description: `Hospital Bill #${bill.bill_id}`,
                 order_id: orderId,
                 handler: async (response: { razorpay_payment_id: string }) => {
-                    await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/patient/bills/${bill.bill_id}/pay`, {
+                    await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/patient/bills/${bill.bill_id}/pay`, {
                         transactionId: response.razorpay_payment_id,
                         paymentMethod: 'Razorpay Online'
                     }, { headers: { Authorization: `Bearer ${token}` } });
